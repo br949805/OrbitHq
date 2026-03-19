@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&family=Chango&display=swap');
+:root{
+  --bg:#0f0f0f;--bg2:#161616;--bg3:#1e1e1e;--bg4:#252525;
+  --border:#2a2a2a;--border2:#333;
+  --text:#e8e6e0;--text2:#9a9690;--text3:#5a5854;
+  --accent:#c8f064;--accent-dim:#8aaa3a;
+  --red:#ff5c5c;--red-bg:#1f1010;--red-border:#3a1515;
+  --amber:#f0a040;--amber-bg:#1a1508;--amber-border:#352a0a;
+  --blue:#5c9fff;--blue-bg:#0d1825;
+  --purple:#b07aff;--purple-bg:#1a1030;
+  --teal:#40d9c0;--teal-bg:#0a1f1c;
+  --mono:'DM Mono',monospace;--sans:'Syne',sans-serif;
+  --r:4px;--t:0.15s ease;
+}

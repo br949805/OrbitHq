@@ -1,0 +1,50 @@
+#sidebar{width:192px;min-width:192px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;padding:10px 0;flex-shrink:0}
+.sl{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding:0 12px;margin-bottom:3px;margin-top:10px}
+.sl:first-child{margin-top:0}
+.si{display:flex;align-items:center;gap:7px;padding:5px 12px;cursor:pointer;color:var(--text2);font-size:14px;transition:all var(--t);border-left:2px solid transparent;user-select:none}
+.si:hover{color:var(--text);background:var(--bg3)}
+.si.active{color:var(--accent);border-left-color:var(--accent);background:var(--bg3)}
+.si .ic{width:15px;text-align:center;font-size:14px;flex-shrink:0}
+.sbadge{margin-left:auto;background:var(--bg4);color:var(--text3);font-size:11px;font-weight:700;font-family:var(--sans);border-radius:8px;padding:1px 5px;min-width:16px;text-align:center}
+.sbadge.red{background:var(--red);color:#fff}
+.sbadge.amber{background:var(--amber);color:#0f0f0f}
+.sbadge.green{background:var(--accent-dim);color:#0f0f0f}
+.folder-row{display:flex;align-items:center;gap:7px;padding:5px 12px;cursor:pointer;color:var(--text2);font-size:14px;transition:all var(--t);border-left:2px solid transparent}
+.folder-row:hover{color:var(--text);background:var(--bg3)}
+.folder-row.active{color:var(--accent);border-left-color:var(--accent)}
+.folder-row.sub{padding-left:28px;font-size:12px}
+.folder-actions-wrap{display:none;gap:2px;margin-left:auto}
+.folder-row:hover .folder-actions-wrap{display:flex}
+.fax{background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:1px 3px;border-radius:2px}
+.fax:hover{color:var(--text);background:var(--bg4)}
+.add-folder{display:flex;align-items:center;gap:6px;padding:4px 12px;cursor:pointer;color:var(--text3);font-size:13px;transition:color var(--t)}
+.add-folder:hover{color:var(--accent)}
+.tag-row{display:flex;align-items:center;gap:7px;padding:5px 12px;cursor:pointer;color:var(--text2);font-size:14px;transition:all var(--t);border-left:2px solid transparent}
+.tag-row:hover{color:var(--text);background:var(--bg3)}
+.tag-row.active{color:var(--accent);border-left-color:var(--accent)}
+.tag-row:hover .folder-actions-wrap{display:flex}
+.tag-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.sb-bottom{margin-top:auto;border-top:1px solid var(--border);padding-top:6px}
+
+/* ── Notebook Switcher ────────────────────────────────────── */
+#nb-switcher{position:relative;padding:6px 8px 4px;border-bottom:1px solid var(--border);margin-bottom:4px;flex-shrink:0}
+#nb-current{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r);cursor:pointer;transition:background var(--t);font-size:13px;font-weight:600;font-family:var(--sans);color:var(--text);user-select:none}
+#nb-current:hover{background:var(--bg3)}
+#nb-current-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#nb-caret{font-size:10px;color:var(--text3);flex-shrink:0}
+#nb-dropdown{display:none;position:absolute;left:8px;right:8px;top:calc(100% - 4px);background:var(--bg3);border:1px solid var(--border2,var(--border));border-radius:var(--r);z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.5);overflow:hidden}
+#nb-dropdown.open{display:block}
+.nb-row{display:flex;align-items:center;gap:7px;padding:7px 10px;cursor:pointer;font-size:13px;color:var(--text2);transition:background var(--t)}
+.nb-row:hover{background:var(--bg4,var(--bg3));color:var(--text)}
+.nb-row.active{color:var(--accent)}
+.nb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.nb-dot.connected{background:var(--accent)}
+.nb-dot.pending{background:var(--amber)}
+.nb-dot.disconnected{background:var(--text3)}
+.nb-row-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nb-row-actions{display:none;gap:2px}
+.nb-row:hover .nb-row-actions{display:flex}
+.nb-row-actions button{background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:2px 4px;border-radius:2px}
+.nb-row-actions button:hover{color:var(--text);background:var(--bg4,var(--bg2))}
+.nb-action{display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;color:var(--text3);font-size:12px;border-top:1px solid var(--border);transition:color var(--t)}
+.nb-action:hover{color:var(--accent)}

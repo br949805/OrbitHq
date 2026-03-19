@@ -1,0 +1,469 @@
+/* ── theme-dos-white.css ─────────────────────────────────────────
+   Retro DOS White Phosphor theme. Applied when body[data-theme="dos-white"].
+   Muted off-white/silver on black CRT aesthetic — IBM 3270 / white
+   phosphor monochrome monitor look. Same sharp structure as Retro DOS.
+   ─────────────────────────────────────────────────────────────── */
+
+/* ── Variable overrides ─────────────────────────────────────── */
+[data-theme="dos-white"] {
+  --bg:           #000000;
+  --bg2:          #000000;
+  --bg3:          #0a0a0a;
+  --bg4:          #141414;
+  --border:       #222222;
+  --border2:      #3a3a3a;
+  --text:         #c8c8c8;
+  --text2:        #888888;
+  --text3:        #444444;
+  --accent:       #e2e2e2;
+  --accent-dim:   #aaaaaa;
+  --red:          #cc5555;
+  --red-bg:       #130000;
+  --red-border:   #3d1515;
+  --amber:        #aa8833;
+  --amber-bg:     #0d0a00;
+  --amber-border: #332800;
+  --blue:         #7aaacc;
+  --blue-bg:      #080e14;
+  --purple:       #9988bb;
+  --purple-bg:    #0a0814;
+  --teal:         #55aaa0;
+  --teal-bg:      #05100f;
+  --mono:         'Courier New', 'Courier', monospace;
+  --sans:         'Courier New', 'Courier', monospace;
+  --r:            0px;
+  --t:            0s;
+}
+
+/* ── Scanline CRT overlay ───────────────────────────────────── */
+[data-theme="dos-white"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.10) 3px,
+    rgba(0, 0, 0, 0.10) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Scrollbars ─────────────────────────────────────────────── */
+[data-theme="dos-white"] ::-webkit-scrollbar        { width: 10px; height: 10px; }
+[data-theme="dos-white"] ::-webkit-scrollbar-track  { background: var(--bg3); border-left: 1px solid var(--border); }
+[data-theme="dos-white"] ::-webkit-scrollbar-thumb  { background: var(--border2); border-radius: 0; border: 1px solid var(--border); }
+[data-theme="dos-white"] ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ── Topbar — reverse video white ──────────────────────────── */
+[data-theme="dos-white"] #topbar {
+  background: var(--accent);
+  border-bottom: 2px solid var(--accent-dim);
+  height: 60px;
+}
+
+[data-theme="dos-white"] #logo {
+  font-family: 'Chango', cursive;
+  font-size: 36px;
+  font-weight: 400;
+  color: #000;
+  letter-spacing: -0.5px;
+  text-transform: none;
+}
+
+[data-theme="dos-white"] .tb-btn {
+  background: #000;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  transition: none;
+}
+[data-theme="dos-white"] .tb-btn:hover { background: var(--accent); color: #000; opacity: 1; }
+
+[data-theme="dos-white"] .tb-icon {
+  border-radius: 0;
+  border: 1px solid #000;
+  color: #000;
+  background: none;
+}
+[data-theme="dos-white"] .tb-icon:hover { background: #000; color: var(--accent); border-color: #000; }
+
+[data-theme="dos-white"] .tb-badge {
+  background: var(--red);
+  border-radius: 0;
+  border: 1px solid #000;
+}
+
+/* ── Search ─────────────────────────────────────────────────── */
+[data-theme="dos-white"] #search-input {
+  background: #000;
+  border: 1px solid var(--border2);
+  border-radius: 0;
+  color: var(--text);
+  font-family: var(--mono);
+}
+[data-theme="dos-white"] #search-input:focus    { border-color: var(--accent); }
+[data-theme="dos-white"] #search-input::placeholder { color: var(--text3); }
+[data-theme="dos-white"] #search-icon           { color: var(--text3); }
+
+[data-theme="dos-white"] #search-results {
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 var(--accent-dim);
+}
+[data-theme="dos-white"] .sr-section  { font-family: var(--mono); color: var(--text3); border-bottom-color: var(--border); }
+[data-theme="dos-white"] .sr-item     { font-size: 14px; }
+[data-theme="dos-white"] .sr-item:hover { background: var(--accent); color: #000; }
+[data-theme="dos-white"] .sr-item:hover .sr-title { color: #000; }
+[data-theme="dos-white"] .sr-item:hover .sr-meta  { color: #000; }
+[data-theme="dos-white"] .sr-empty    { font-family: var(--mono); color: var(--text3); }
+
+/* ── Sidebar ────────────────────────────────────────────────── */
+[data-theme="dos-white"] #sidebar {
+  background: var(--bg);
+  border-right: 2px solid var(--border2);
+}
+
+[data-theme="dos-white"] .sl {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  padding: 0 12px 2px;
+  margin-top: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dos-white"] .si {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text2);
+  border-left: none;
+  padding: 4px 10px;
+}
+[data-theme="dos-white"] .si:hover { background: var(--bg3); color: var(--accent); }
+[data-theme="dos-white"] .si.active {
+  background: var(--accent);
+  color: #000;
+  border-left: none;
+  padding-left: 10px;
+}
+[data-theme="dos-white"] .si.active .ic         { color: #000 !important; }
+[data-theme="dos-white"] .si.active .sbadge     { background: #000; color: var(--accent); border: 1px solid #000; }
+
+[data-theme="dos-white"] .sbadge {
+  border-radius: 0;
+  background: var(--bg4);
+  color: var(--text3);
+  border: 1px solid var(--border);
+}
+[data-theme="dos-white"] .sbadge.red   { background: var(--red); color: #fff; border-color: var(--red); }
+[data-theme="dos-white"] .sbadge.amber { background: var(--amber); color: #000; border-color: var(--amber-border); }
+[data-theme="dos-white"] .sbadge.green { background: var(--accent-dim); color: #000; border-color: var(--accent-dim); }
+
+[data-theme="dos-white"] .folder-row {
+  font-family: var(--mono);
+  font-size: 13px;
+  border-left: none;
+}
+[data-theme="dos-white"] .folder-row:hover  { background: var(--bg3); color: var(--accent); }
+[data-theme="dos-white"] .folder-row.active { background: var(--accent); color: #000; border-left: none; }
+
+[data-theme="dos-white"] .add-folder { font-family: var(--mono); color: var(--text3); font-size: 13px; }
+[data-theme="dos-white"] .add-folder:hover { color: var(--accent); }
+
+[data-theme="dos-white"] .fax { font-family: var(--mono); }
+[data-theme="dos-white"] .fax:hover { background: var(--bg4); color: var(--accent); }
+
+[data-theme="dos-white"] .sb-bottom { border-top-color: var(--border2); }
+
+/* ── Task panel ─────────────────────────────────────────────── */
+[data-theme="dos-white"] #task-panel    { border-right: 2px solid var(--border2); background: var(--bg); }
+[data-theme="dos-white"] #tp-header h2  { font-family: var(--mono); font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; font-size: 14px; }
+[data-theme="dos-white"] .add-task-btn  { border-radius: 0; font-family: var(--mono); border-style: solid; }
+[data-theme="dos-white"] .add-task-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+[data-theme="dos-white"] .tsec-name     { font-family: var(--mono); }
+[data-theme="dos-white"] .tsec-ct       { font-family: var(--mono); }
+[data-theme="dos-white"] .tsec-hdr:hover { background: var(--bg3); }
+
+[data-theme="dos-white"] .tcard         { border-left-color: transparent; }
+[data-theme="dos-white"] .tcard:hover   { background: var(--bg3); }
+[data-theme="dos-white"] .tcard.ov-card { border-left-color: var(--red); background: var(--red-bg); }
+[data-theme="dos-white"] .tcard.td-card { border-left-color: var(--amber); background: var(--amber-bg); }
+
+[data-theme="dos-white"] .tchk          { border-radius: 0; border-color: var(--border2); }
+[data-theme="dos-white"] .tchk:hover    { border-color: var(--accent); }
+[data-theme="dos-white"] .tchk.done     { background: var(--accent); border-color: var(--accent); }
+[data-theme="dos-white"] .tchk.done::after { color: #000; }
+
+[data-theme="dos-white"] .ttitle        { font-family: var(--mono); font-size: 13px; border-radius: 0; }
+[data-theme="dos-white"] .ttitle:focus  { background: var(--bg4); }
+
+[data-theme="dos-white"] .tdate         { font-family: var(--mono); border-radius: 0; }
+[data-theme="dos-white"] .tdate:hover   { border-color: var(--border2); }
+
+[data-theme="dos-white"] .dgrp-hdr      { font-family: var(--mono); border-top-color: var(--border); }
+[data-theme="dos-white"] .empty-sec     { font-family: var(--mono); font-style: normal; color: var(--text3); }
+[data-theme="dos-white"] #archive-link  { font-family: var(--mono); border-top-color: var(--border); }
+
+/* ── Notes list ─────────────────────────────────────────────── */
+[data-theme="dos-white"] #notes-list    { border-right: 2px solid var(--border2); background: var(--bg); }
+[data-theme="dos-white"] #nl-header h3  { font-family: var(--mono); font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; font-size: 13px; }
+[data-theme="dos-white"] .new-note-btn  { border-radius: 0; border-style: solid; font-family: var(--mono); }
+[data-theme="dos-white"] .new-note-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+[data-theme="dos-white"] .nl-sec-hdr    { font-family: var(--mono); color: var(--text3); border-bottom-color: var(--border); }
+
+[data-theme="dos-white"] .nitem         { border-bottom-color: var(--border); }
+[data-theme="dos-white"] .nitem:hover   { background: var(--bg3); }
+[data-theme="dos-white"] .nitem.active  {
+  background: var(--bg3);
+  border-left: 2px solid var(--accent);
+  padding-left: 10px;
+}
+
+[data-theme="dos-white"] .ntbadge       { border-radius: 0; }
+[data-theme="dos-white"] .ntitle        { font-family: var(--mono); font-size: 12px; font-weight: 400; }
+[data-theme="dos-white"] .nmeta         { font-family: var(--mono); }
+[data-theme="dos-white"] .npreview      { font-family: var(--mono); color: var(--text3); }
+[data-theme="dos-white"] .nufiled       { border-radius: 0; border-color: var(--border); font-family: var(--mono); }
+[data-theme="dos-white"] .npin          { color: var(--accent); }
+
+/* type badge overrides */
+[data-theme="dos-white"] .type-scratchpad { background: var(--bg4);     color: var(--text3); }
+[data-theme="dos-white"] .type-meeting    { background: var(--blue-bg); color: var(--blue); }
+[data-theme="dos-white"] .type-snippet    { background: var(--teal-bg); color: var(--teal); }
+[data-theme="dos-white"] .type-idea       { background: var(--amber-bg);color: var(--amber); }
+[data-theme="dos-white"] .type-plan       { background: var(--purple-bg);color: var(--purple); }
+[data-theme="dos-white"] .type-note       { background: var(--bg4);     color: var(--text2); }
+
+/* ── Editor panel ───────────────────────────────────────────── */
+[data-theme="dos-white"] #editor-panel   { background: var(--bg); }
+[data-theme="dos-white"] #ed-header      { border-bottom-color: var(--border2); }
+
+[data-theme="dos-white"] #ed-title {
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+[data-theme="dos-white"] #ed-title::placeholder { color: var(--text3); }
+
+[data-theme="dos-white"] .ed-btn         { border-radius: 0; font-family: var(--mono); border-color: var(--border2); color: var(--text2); }
+[data-theme="dos-white"] .ed-btn:hover   { background: var(--bg3); color: var(--accent); border-color: var(--accent); }
+[data-theme="dos-white"] .ed-btn.pinned  { background: var(--accent); color: #000; border-color: var(--accent); }
+[data-theme="dos-white"] .ed-btn.danger  { color: var(--red); border-color: var(--red-border); }
+[data-theme="dos-white"] .ed-btn.danger:hover { background: var(--red-bg); }
+
+[data-theme="dos-white"] #meta-block     { background: var(--bg); border-bottom-color: var(--border2); }
+[data-theme="dos-white"] .ml             { font-family: var(--mono); color: var(--text3); letter-spacing: 0.05em; }
+[data-theme="dos-white"] .mi             { background: var(--bg); border-radius: 0; border-color: var(--border2); font-family: var(--mono); color: var(--text); }
+[data-theme="dos-white"] .mi:focus       { border-color: var(--accent); }
+[data-theme="dos-white"] .ms             { background: var(--bg); border-radius: 0; border-color: var(--border2); font-family: var(--mono); color: var(--text); }
+[data-theme="dos-white"] .ms:focus       { border-color: var(--accent); }
+[data-theme="dos-white"] .ms option      { background: var(--bg); }
+
+[data-theme="dos-white"] #ctx-prompt     { border-radius: 0; border-bottom-color: var(--amber-border); }
+[data-theme="dos-white"] .cp-btn         { border-radius: 0; font-family: var(--mono); }
+
+[data-theme="dos-white"] #ed-toolbar     { background: var(--bg); border-bottom: 1px solid var(--border2); }
+[data-theme="dos-white"] .tbb            { font-family: var(--mono); color: var(--text2); }
+[data-theme="dos-white"] .tbb:hover      { background: var(--accent); color: #000; }
+[data-theme="dos-white"] .tbb-sep        { background: var(--border2); }
+[data-theme="dos-white"] .autosave       { font-family: var(--mono); color: var(--text3); }
+[data-theme="dos-white"] .asdot.saved    { background: var(--accent); }
+
+[data-theme="dos-white"] #ed-content {
+  font-family: var(--mono);
+  caret-color: var(--accent);
+  color: var(--text);
+}
+[data-theme="dos-white"] #ed-content h1 {
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border2);
+  padding-bottom: 3px;
+}
+[data-theme="dos-white"] #ed-content h2 {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+[data-theme="dos-white"] #ed-content h3 {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 0.03em;
+}
+[data-theme="dos-white"] #ed-content strong   { color: var(--accent); }
+[data-theme="dos-white"] #ed-content em       { color: var(--text2); font-style: normal; text-decoration: underline; }
+[data-theme="dos-white"] #ed-content u        { text-decoration-color: var(--accent); }
+[data-theme="dos-white"] #ed-content hr       { border-top-color: var(--border2); }
+[data-theme="dos-white"] #ed-content pre      { background: var(--bg3); border-color: var(--border2); border-radius: 0; }
+[data-theme="dos-white"] #ed-content pre code { color: var(--teal); }
+[data-theme="dos-white"] #ed-content code     { background: var(--bg3); border-radius: 0; color: var(--teal); }
+[data-theme="dos-white"] #ed-content table    { border-color: var(--border2); }
+[data-theme="dos-white"] #ed-content th {
+  font-family: var(--mono);
+  background: var(--accent);
+  color: #000;
+  border-color: var(--border2);
+  text-transform: uppercase;
+}
+[data-theme="dos-white"] #ed-content td       { border-color: var(--border); }
+[data-theme="dos-white"] #ed-content tr:hover td { background: var(--bg3); }
+
+[data-theme="dos-white"] .wiki-link            { color: var(--teal); border-bottom-color: var(--teal); }
+[data-theme="dos-white"] .wiki-link:hover      { color: #000; background: var(--teal); border-bottom-color: var(--teal); }
+[data-theme="dos-white"] .wiki-link.broken     { color: var(--text3); border-bottom-color: var(--text3); }
+
+[data-theme="dos-white"] #backlinks             { border-top-color: var(--border2); }
+[data-theme="dos-white"] .bl-hdr span          { font-family: var(--mono); color: var(--text3); }
+[data-theme="dos-white"] .bl-link              { font-family: var(--mono); color: var(--teal); }
+[data-theme="dos-white"] .bl-empty            { font-family: var(--mono); font-style: normal; color: var(--text3); }
+
+[data-theme="dos-white"] #ed-empty .ee-icon    { opacity: 0.15; }
+[data-theme="dos-white"] #ed-empty .ee-title   { font-family: var(--mono); font-weight: 400; text-transform: uppercase; color: var(--text3); }
+[data-theme="dos-white"] .kbd {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 0;
+  font-family: var(--mono);
+  color: var(--accent);
+}
+
+/* ── Wiki autocomplete ──────────────────────────────────────── */
+[data-theme="dos-white"] #wiki-ac {
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 var(--accent-dim);
+}
+[data-theme="dos-white"] .wac-item:hover,
+[data-theme="dos-white"] .wac-item.foc        { background: var(--accent); }
+[data-theme="dos-white"] .wac-item:hover .wn,
+[data-theme="dos-white"] .wac-item.foc .wn   { color: #000; }
+
+/* ── Float toolbar ──────────────────────────────────────────── */
+[data-theme="dos-white"] #float-tb {
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  box-shadow: 2px 2px 0 var(--accent-dim);
+}
+[data-theme="dos-white"] .ftb              { font-family: var(--mono); color: var(--text2); }
+[data-theme="dos-white"] .ftb:hover        { background: var(--accent); color: #000; }
+[data-theme="dos-white"] .ftb.accent       { color: var(--accent); }
+[data-theme="dos-white"] .ftb.accent:hover { background: var(--accent); color: #000; }
+
+/* ── Modals — DOS dialog box ────────────────────────────────── */
+[data-theme="dos-white"] .mo {
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: none;
+}
+[data-theme="dos-white"] .mb {
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--accent-dim);
+  animation: none;
+}
+[data-theme="dos-white"] .mh {
+  background: var(--accent);
+  border-bottom: 2px solid var(--accent-dim);
+  padding: 10px 14px 8px;
+}
+[data-theme="dos-white"] .mh h3 {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #000;
+}
+[data-theme="dos-white"] .mc            { color: #000; background: none; }
+[data-theme="dos-white"] .mc:hover      { background: #000; color: var(--accent); }
+[data-theme="dos-white"] .mhint         { font-family: var(--mono); color: var(--text3); }
+
+[data-theme="dos-white"] .fl            { font-family: var(--mono); color: var(--text2); letter-spacing: 0.05em; }
+[data-theme="dos-white"] .fi            { background: var(--bg); border-color: var(--border2); border-radius: 0; font-family: var(--mono); color: var(--text); }
+[data-theme="dos-white"] .fi:focus      { border-color: var(--accent); box-shadow: none; }
+[data-theme="dos-white"] .fsel          { background: var(--bg); border-color: var(--border2); border-radius: 0; font-family: var(--mono); color: var(--text); }
+[data-theme="dos-white"] .fsel:focus    { border-color: var(--accent); }
+[data-theme="dos-white"] .fsel option   { background: var(--bg); }
+
+[data-theme="dos-white"] .btn-pr        { background: var(--accent); color: #000; border-radius: 0; font-family: var(--mono); font-weight: 400; letter-spacing: 0.05em; }
+[data-theme="dos-white"] .btn-pr:hover  { background: var(--accent-dim); opacity: 1; }
+[data-theme="dos-white"] .btn-gh        { border-radius: 0; font-family: var(--mono); border-color: var(--border2); color: var(--text2); }
+[data-theme="dos-white"] .btn-gh:hover  { border-color: var(--accent); color: var(--accent); background: var(--bg3); }
+[data-theme="dos-white"] .btn-dr        { border-radius: 0; font-family: var(--mono); }
+[data-theme="dos-white"] .btn-p, [data-theme="dos-white"] .btn-g, [data-theme="dos-white"] .btn-d { border-radius: 0; font-family: var(--mono); }
+
+[data-theme="dos-white"] .type-grid     { gap: 5px; }
+[data-theme="dos-white"] .type-opt      { border-radius: 0; border-color: var(--border2); }
+[data-theme="dos-white"] .type-opt:hover { border-color: var(--accent); background: var(--bg3); }
+[data-theme="dos-white"] .type-opt.sel  { background: var(--accent); border-color: var(--accent); }
+[data-theme="dos-white"] .type-opt.sel .to-name { color: #000 !important; }
+[data-theme="dos-white"] .to-name       { font-family: var(--mono); font-weight: 400; font-size: 12px; }
+[data-theme="dos-white"] .to-desc       { font-family: var(--mono); color: var(--text3); }
+
+/* ── Settings panel ─────────────────────────────────────────── */
+[data-theme="dos-white"] #settings-panel {
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--accent-dim);
+}
+[data-theme="dos-white"] #settings-panel h3 {
+  font-family: var(--mono);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 15px;
+  color: var(--accent);
+}
+[data-theme="dos-white"] .set-lbl       { font-family: var(--mono); color: var(--text2); font-size: 13px; }
+[data-theme="dos-white"] .set-desc      { font-family: var(--mono); color: var(--text3); font-size: 11px; }
+[data-theme="dos-white"] .set-row       { border-bottom-color: var(--border); }
+
+/* ── Nudges ──────────────────────────────────────────────────── */
+[data-theme="dos-white"] .nudge         { border-radius: 0; border-top: 2px solid var(--border2); border-bottom: 2px solid var(--border2); }
+[data-theme="dos-white"] .n-btn         { border-radius: 0; font-family: var(--mono); }
+[data-theme="dos-white"] .n-x           { border-radius: 0; font-family: var(--mono); }
+
+/* ── Toast ───────────────────────────────────────────────────── */
+[data-theme="dos-white"] #toast {
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  box-shadow: 2px 2px 0 var(--accent-dim);
+  font-family: var(--mono);
+  color: var(--accent);
+  transition: opacity .15s, transform .15s;
+}
+
+/* ── Archive view ────────────────────────────────────────────── */
+[data-theme="dos-white"] #archive-view  { background: var(--bg); }
+[data-theme="dos-white"] #av-hdr h2     { font-family: var(--mono); font-weight: 400; text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ── Reconnect banner ─────────────────────────────────────────── */
+[data-theme="dos-white"] #reconnect-banner { background: var(--amber-bg); border-bottom-color: var(--amber-border); }
+[data-theme="dos-white"] .rb-btn { border-radius: 0; font-family: var(--mono); font-size: 12px; font-weight: 400; }

@@ -1,0 +1,89 @@
+/* ── font-scale.css ────────────────────────────────────────────
+   User-controlled font size scaling. Applied via data-font-size
+   attribute on <html>. Excludes #logo and logo-related elements.
+   Uses !important to override theme-specific font-size rules.
+   ─────────────────────────────────────────────────────────── */
+
+/* ── Small (-2px from default 14px base) ─────────────────── */
+html[data-font-size="small"] body                   { font-size: 12px !important; }
+html[data-font-size="small"] .si                    { font-size: 12px !important; }
+html[data-font-size="small"] .sl                    { font-size: 10px !important; }
+html[data-font-size="small"] .folder-row            { font-size: 11px !important; }
+html[data-font-size="small"] .add-folder            { font-size: 11px !important; }
+html[data-font-size="small"] .ntitle                { font-size: 11px !important; }
+html[data-font-size="small"] .nmeta                 { font-size: 10px !important; }
+html[data-font-size="small"] .npreview              { font-size: 10px !important; }
+html[data-font-size="small"] .ttitle                { font-size: 11px !important; }
+html[data-font-size="small"] .tdate                 { font-size: 10px !important; }
+html[data-font-size="small"] .tsec-name             { font-size: 10px !important; }
+html[data-font-size="small"] #ed-content            { font-size: 13px !important; }
+html[data-font-size="small"] #ed-title              { font-size: 16px !important; }
+html[data-font-size="small"] .mh h3                 { font-size: 13px !important; }
+html[data-font-size="small"] .set-lbl               { font-size: 12px !important; }
+html[data-font-size="small"] .fi                    { font-size: 12px !important; }
+html[data-font-size="small"] .fsel                  { font-size: 12px !important; }
+html[data-font-size="small"] .btn-pr,
+html[data-font-size="small"] .btn-gh,
+html[data-font-size="small"] .btn-dr                { font-size: 11px !important; }
+html[data-font-size="small"] .add-task-btn,
+html[data-font-size="small"] .new-note-btn          { font-size: 11px !important; }
+html[data-font-size="small"] .ed-btn                { font-size: 10px !important; }
+html[data-font-size="small"] #tp-header h2          { font-size: 13px !important; }
+html[data-font-size="small"] #nl-header h3          { font-size: 12px !important; }
+html[data-font-size="small"] #settings-panel h3     { font-size: 13px !important; }
+
+/* ── Large (+2px from default 14px base) ─────────────────── */
+html[data-font-size="large"] body                   { font-size: 16px !important; }
+html[data-font-size="large"] .si                    { font-size: 16px !important; }
+html[data-font-size="large"] .sl                    { font-size: 14px !important; }
+html[data-font-size="large"] .folder-row            { font-size: 15px !important; }
+html[data-font-size="large"] .add-folder            { font-size: 15px !important; }
+html[data-font-size="large"] .ntitle                { font-size: 15px !important; }
+html[data-font-size="large"] .nmeta                 { font-size: 14px !important; }
+html[data-font-size="large"] .npreview              { font-size: 14px !important; }
+html[data-font-size="large"] .ttitle                { font-size: 15px !important; }
+html[data-font-size="large"] .tdate                 { font-size: 14px !important; }
+html[data-font-size="large"] .tsec-name             { font-size: 14px !important; }
+html[data-font-size="large"] #ed-content            { font-size: 17px !important; }
+html[data-font-size="large"] #ed-title              { font-size: 20px !important; }
+html[data-font-size="large"] .mh h3                 { font-size: 17px !important; }
+html[data-font-size="large"] .set-lbl               { font-size: 16px !important; }
+html[data-font-size="large"] .fi                    { font-size: 16px !important; }
+html[data-font-size="large"] .fsel                  { font-size: 16px !important; }
+html[data-font-size="large"] .btn-pr,
+html[data-font-size="large"] .btn-gh,
+html[data-font-size="large"] .btn-dr                { font-size: 15px !important; }
+html[data-font-size="large"] .add-task-btn,
+html[data-font-size="large"] .new-note-btn          { font-size: 15px !important; }
+html[data-font-size="large"] .ed-btn                { font-size: 14px !important; }
+html[data-font-size="large"] #tp-header h2          { font-size: 17px !important; }
+html[data-font-size="large"] #nl-header h3          { font-size: 16px !important; }
+html[data-font-size="large"] #settings-panel h3     { font-size: 18px !important; }
+
+/* ── X-Large (+4px from default 14px base) ───────────────── */
+html[data-font-size="xlarge"] body                  { font-size: 18px !important; }
+html[data-font-size="xlarge"] .si                   { font-size: 18px !important; }
+html[data-font-size="xlarge"] .sl                   { font-size: 16px !important; }
+html[data-font-size="xlarge"] .folder-row           { font-size: 17px !important; }
+html[data-font-size="xlarge"] .add-folder           { font-size: 17px !important; }
+html[data-font-size="xlarge"] .ntitle               { font-size: 17px !important; }
+html[data-font-size="xlarge"] .nmeta                { font-size: 16px !important; }
+html[data-font-size="xlarge"] .npreview             { font-size: 16px !important; }
+html[data-font-size="xlarge"] .ttitle               { font-size: 17px !important; }
+html[data-font-size="xlarge"] .tdate                { font-size: 16px !important; }
+html[data-font-size="xlarge"] .tsec-name            { font-size: 16px !important; }
+html[data-font-size="xlarge"] #ed-content           { font-size: 19px !important; }
+html[data-font-size="xlarge"] #ed-title             { font-size: 22px !important; }
+html[data-font-size="xlarge"] .mh h3                { font-size: 19px !important; }
+html[data-font-size="xlarge"] .set-lbl              { font-size: 18px !important; }
+html[data-font-size="xlarge"] .fi                   { font-size: 18px !important; }
+html[data-font-size="xlarge"] .fsel                 { font-size: 18px !important; }
+html[data-font-size="xlarge"] .btn-pr,
+html[data-font-size="xlarge"] .btn-gh,
+html[data-font-size="xlarge"] .btn-dr               { font-size: 17px !important; }
+html[data-font-size="xlarge"] .add-task-btn,
+html[data-font-size="xlarge"] .new-note-btn         { font-size: 17px !important; }
+html[data-font-size="xlarge"] .ed-btn               { font-size: 16px !important; }
+html[data-font-size="xlarge"] #tp-header h2         { font-size: 19px !important; }
+html[data-font-size="xlarge"] #nl-header h3         { font-size: 18px !important; }
+html[data-font-size="xlarge"] #settings-panel h3    { font-size: 20px !important; }

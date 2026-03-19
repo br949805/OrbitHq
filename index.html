@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbit Hq</title>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/topbar.css">
+<link rel="stylesheet" href="css/search.css">
+<link rel="stylesheet" href="css/sidebar.css">
+<link rel="stylesheet" href="css/nudges.css">
+<link rel="stylesheet" href="css/tasks.css">
+<link rel="stylesheet" href="css/notes.css">
+<link rel="stylesheet" href="css/editor.css">
+<link rel="stylesheet" href="css/inbox.css">
+<link rel="stylesheet" href="css/archive.css">
+<link rel="stylesheet" href="css/modals.css">
+<link rel="stylesheet" href="css/toast.css">
+<link rel="stylesheet" href="css/theme-clean.css">
+<link rel="stylesheet" href="css/theme-clean-dark.css">
+<link rel="stylesheet" href="css/theme-vibrant.css">
+<link rel="stylesheet" href="css/theme-carbon.css">
+<link rel="stylesheet" href="css/tour.css">
+<link rel="stylesheet" href="css/font-scale.css">
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div id="logo-wrap">
+    <svg id="logo-img" class="tb-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" aria-hidden="true">
+      <path fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" d="M79.947,105.032c-15.485-0.153-27.005-12.526-26.432-27.386c0.555-14.369,12.512-25.036,25.746-25.117c16.253-0.1,27.135,13.029,26.697,27.552C105.562,93.265,92.905,105.413,79.947,105.032z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" d="M124.424,17.799c-0.877-0.114-1.753-0.23-2.63-0.339c-9.795-1.216-19.343,0.081-28.747,2.835c-9.345,2.736-18.179,6.633-26.677,11.394c-16.55,9.271-30.916,21.121-42.822,35.889C16.692,76.08,11.407,85.479,8.599,96.1c-1.718,6.493-2.662,12.439-0.949,22.378c-0.417-1.377-0.918-2.734-1.235-4.135c-1.996-8.821-0.947-17.478,1.665-25.99c3.196-10.42,8.69-19.641,15.23-28.271c6.907-9.113,15.264-16.732,24.588-23.272c15.925-11.167,33.417-18.527,52.785-21.083c7.405-0.977,14.8-0.845,22.086,1.049c0.601,0.156,1.173,0.42,1.759,0.634C124.493,17.539,124.458,17.668,124.424,17.799z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" d="M17.601,132.905c2.417,1.329,4.763,2.813,7.264,3.959c7.802,3.577,16.054,4.51,24.547,3.944c13.695-0.912,26.2-5.547,38.199-11.921c12.586-6.687,23.755-15.231,33.62-25.463c3.445-3.573,6.48-7.54,9.699-11.332c0.354-0.414,0.678-0.853,0.986-1.243c2.229,1.441,4.346,2.809,6.755,4.364c-2.474,2.868-4.853,5.824-7.438,8.586c-13.198,14.112-28.706,24.928-46.598,32.256c-7.919,3.244-16.146,5.5-24.623,6.652c-10.971,1.491-21.842,1.12-32.167-3.35c-3.315-1.436-6.278-3.683-9.397-5.568c-0.36-0.218-0.686-0.492-1.028-0.741C17.48,133.001,17.541,132.953,17.601,132.905z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" d="M143.918,92.965c-7.187,0.201-13.731-6.231-13.832-13.598c-0.107-7.846,5.968-14.005,14.019-14.213c7.48-0.193,13.737,5.966,13.978,13.762C158.317,86.563,152.094,92.736,143.918,92.965z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" d="M106.999,24.784c-1.663,0.313-3.323,0.625-4.984,0.939c-9.071,1.707-17.479,5.187-25.54,9.584c-5.994,3.269-11.638,7.075-16.859,11.463c-9.634,8.097-17.725,17.465-23.003,29.011c-2.979,6.515-4.973,13.317-4.993,20.564c-0.028,10.029,3.785,18.115,12.437,23.485c4.518,2.804,9.604,4.051,14.935,4.229c9.377,0.319,18.073-2.155,26.356-6.358c0.541-0.274,1.091-0.537,1.646-0.784c0.168-0.074,0.367-0.081,0.59-0.021c-4.405,2.845-9.085,5.144-14.06,6.767c-7.69,2.509-15.552,3.604-23.563,1.813c-11.765-2.627-19.684-10.748-21.829-22.504c-1.907-10.451,0.841-20.142,5.651-29.349c6.108-11.692,14.798-21.155,25.26-29.095c8.061-6.117,16.778-11.04,26.187-14.741c6.496-2.555,13.251-4.14,20.125-5.26c0.521-0.085,1.058-0.088,1.587-0.129C106.96,24.527,106.979,24.656,106.999,24.784z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" d="M75.686,40.269c4.82-3.159,10.075-5.384,15.625-6.919c7.109-1.967,14.323-2.725,21.51-0.758c10.378,2.839,16.348,9.903,18.457,20.336c0.959,4.744,0.702,9.509-0.034,14.251c-0.136,0.87-0.525,1.766-1.017,2.502c-1.798,2.69-2.394,5.698-3.041,8.82c-0.612,2.956-1.942,5.864-3.445,8.513c-4.059,7.156-9.296,13.426-15.157,19.193c-8.15,8.019-17.42,14.409-27.601,19.579c-6.234,3.166-12.709,5.599-19.454,7.367c-0.333,0.088-0.676,0.14-1.113-0.045c0.409-0.147,0.814-0.307,1.229-0.438c21.649-6.897,39.199-19.532,52.729-37.757c6.125-8.252,10.67-17.289,12.659-27.422c1.15-5.861,1.348-11.779-0.406-17.645c-2.616-8.746-8.791-13.512-17.318-15.579c-7.747-1.877-15.359-0.748-22.807,1.643c-3.176,1.02-6.222,2.446-9.323,3.694C76.673,39.809,76.183,40.047,75.686,40.269z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" d="M153.696,65.249c-2.191-0.977-4.344-1.937-6.717-2.996c0.06-0.33,0.138-0.91,0.271-1.477c1.629-6.892,2.332-13.821,0.533-20.783c-2.531-9.802-8.755-16.486-17.802-20.717c-0.359-0.168-0.722-0.33-1.008-0.751c0.564,0.153,1.138,0.282,1.694,0.46c12.625,4.058,20.104,12.794,23.11,25.539C155.403,51.405,155.089,58.301,153.696,65.249z"/>
+    </svg>
+    <span id="logo">Orbit Hq</span>
+  </div>
+    <div id="tb-right">
+  <div id="search-wrap">
+    <span id="search-icon">⌕</span>
+    <input id="search-input" type="text" placeholder="/ search tasks and notes…" autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <button class="tb-icon" onclick="showInbox()" title="Inbox" id="inbox-tb-btn">⊡
+    <span class="tb-badge" id="inbox-tb-badge">0</span>
+  </button>
+  <div id="hamburger-wrap">
+    <button class="tb-icon" id="hamburger-btn" onclick="toggleHamburger()" title="Menu">☰</button>
+    <div id="hamburger-dropdown">
+      <div id="settings-panel">
+        <h3>Settings</h3>
+        <div class="set-row"><div><div class="set-lbl">Auto-archive delay</div><div class="set-desc">Days after completion</div></div><select class="fsel" id="set-archive-delay" style="width:100px" onchange="saveSettings()"><option value="1">1 day</option><option value="3">3 days</option><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option></select></div>
+        <div class="set-row"><div><div class="set-lbl">Inbox word threshold</div><div class="set-desc">Notes under this count go to inbox</div></div><select class="fsel" id="set-word-thresh" style="width:80px" onchange="saveSettings()"><option value="25">25</option><option value="50">50</option><option value="75">75</option><option value="100">100</option></select></div>
+        <div class="set-row"><div><div class="set-lbl">Weekly review day</div><div class="set-desc">When to nudge about inbox</div></div><select class="fsel" id="set-review-day" style="width:110px" onchange="saveSettings()"><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option></select></div>
+        <div class="set-row"><div><div class="set-lbl">UI Theme</div><div class="set-desc">Visual style of the interface</div></div><select class="fsel" id="set-theme" style="width:150px" onchange="saveSettings()"><option value="default">Default Dark</option><option value="clean">Clean Modern</option><option value="clean-dark">Clean Modern Dark</option><option value="vibrant">Vibrant</option><option value="carbon">Carbon</option></select></div>
+        <div class="set-row"><div><div class="set-lbl">Font Size</div><div class="set-desc">Scale text size across the app</div></div><select class="fsel" id="set-font-size" style="width:120px" onchange="saveSettings()"><option value="small">Small</option><option value="default">Default</option><option value="large">Large</option><option value="xlarge">X-Large</option></select></div>
+        <div class="set-row"><div><div class="set-lbl">Note Templates</div><div class="set-desc">Customize starting content for each note type</div></div><button class="btn-gh" onclick="openTemplateEditor()">Edit Templates</button></div>
+        <div class="set-row"><div><div class="set-lbl">Heading Styles</div><div class="set-desc">Customize H1, H2, H3 colors and sizes</div></div><button class="btn-gh" onclick="openHeadingStylesModal()">Edit Styles</button></div>
+        <div class="set-row">
+          <div style="flex:1"><div class="set-lbl">Notebook File</div><span id="set-nb-file-path" class="set-desc" style="font-family:var(--mono);font-size:11px;display:block;margin-top:2px">localStorage only</span></div>
+        </div>
+        <div class="set-row" style="border-bottom:none;padding-top:14px;flex-direction:column;align-items:stretch;gap:8px">
+          <button class="btn-dr" onclick="exportData()">Export JSON</button>
+          <button class="btn-dr" onclick="if(confirm('Delete ALL data?')&&confirm('Are you sure?')){clearAllData()}">Delete All Data</button>
+        </div>
+        <div style="display:flex;justify-content:flex-end;padding:10px 0 2px">
+          <button class="btn-gh" onclick="toggleHamburger();S.settings.tourDone=false;save();startTour()" title="Relaunch the feature tour">⟳ Tour</button>
+        </div>
+      </div>
+      <div id="hm-footer">
+        <div id="file-status" class="fs-indicator" title="No file connected — data saved in browser only">
+          <span class="fs-dot disconnected"></span><span class="fs-name">localStorage</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- WELCOME OVERLAY (shown to new users before any notebook exists) -->
+<div id="welcome-overlay" style="display:none">
+  <div id="welcome-box">
+    <div id="welcome-logo">
+      <svg class="tb-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="48" height="48" aria-hidden="true">
+        <path fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" d="M79.947,105.032c-15.485-0.153-27.005-12.526-26.432-27.386c0.555-14.369,12.512-25.036,25.746-25.117c16.253-0.1,27.135,13.029,26.697,27.552C105.562,93.265,92.905,105.413,79.947,105.032z"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" d="M124.424,17.799c-0.877-0.114-1.753-0.23-2.63-0.339c-9.795-1.216-19.343,0.081-28.747,2.835c-9.345,2.736-18.179,6.633-26.677,11.394c-16.55,9.271-30.916,21.121-42.822,35.889C16.692,76.08,11.407,85.479,8.599,96.1c-1.718,6.493-2.662,12.439-0.949,22.378c-0.417-1.377-0.918-2.734-1.235-4.135c-1.996-8.821-0.947-17.478,1.665-25.99c3.196-10.42,8.69-19.641,15.23-28.271c6.907-9.113,15.264-16.732,24.588-23.272c15.925-11.167,33.417-18.527,52.785-21.083c7.405-0.977,14.8-0.845,22.086,1.049c0.601,0.156,1.173,0.42,1.759,0.634C124.493,17.539,124.458,17.668,124.424,17.799z"/>
+      </svg>
+    </div>
+    <h1 id="welcome-title">Orbit Hq</h1>
+    <p id="welcome-sub">Create or open a notebook to get started.</p>
+    <div id="welcome-name-row">
+      <input id="welcome-nb-name" class="fi" type="text" placeholder="Notebook name…" autocomplete="off"
+             onkeydown="if(event.key==='Enter')welcomeCreateNotebook()">
+      <button class="btn-pr" onclick="welcomeCreateNotebook()">Create Notebook</button>
+    </div>
+    <div id="welcome-divider">— or —</div>
+    <button class="btn-gh" id="welcome-open-btn" onclick="welcomeOpenNotebook()">↗ Open Notebook</button>
+  </div>
+</div>
+
+<!-- RECONNECT BANNER -->
+<div id="reconnect-banner" style="display:none">
+  <span id="reconnect-msg">📂 <strong></strong> — Click to reconnect and load your data.</span>
+  <button class="rb-btn" onclick="reconnectFile()">↺ Reconnect</button>
+  <button class="rb-dismiss" onclick="document.getElementById('reconnect-banner').style.display='none'">✕</button>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <!-- NOTEBOOK SWITCHER -->
+  <div id="nb-switcher">
+    <div id="nb-current" onclick="toggleNotebookDropdown()">
+      <span id="nb-current-name">Notebook 1</span>
+      <span id="nb-caret">▾</span>
+    </div>
+    <div id="nb-dropdown">
+      <div id="nb-list"></div>
+      <div class="nb-action" onclick="openNewNotebookModal()"><span>+</span> Create Notebook</div>
+      <div class="nb-action" onclick="openNotebookAction()"><span>↗</span> Open Notebook</div>
+    </div>
+  </div>
+  <div class="sl" style="margin-top:0">Views</div>
+  <div class="si active" id="sb-dashboard" onclick="showView('dashboard',this)"><span class="ic">▦</span>Dashboard<span class="sbadge" id="sb-task-badge">0</span></div>
+  <div class="si" id="sb-inbox-si" onclick="showView('inbox',this)"><span class="ic" style="color:var(--red)">⊡</span>Inbox<span class="sbadge red" id="sb-inbox-badge">0</span></div>
+  <div class="sl">Notes</div>
+  <div class="si" id="sb-all" onclick="setNoteFilter('all',this)"><span class="ic">◈</span>All Notes<span class="sbadge" id="nb-all">0</span></div>
+  <div class="si" id="sb-pinned" onclick="setNoteFilter('pinned',this)"><span class="ic" style="color:var(--accent)">⊙</span>Pinned<span class="sbadge" id="nb-pinned">0</span></div>
+  <div class="si" id="sb-scratchpad" onclick="setNoteFilter('type:scratchpad',this)"><span class="ic" style="color:var(--text3)">✦</span>Scratchpad<span class="sbadge" id="nb-scratchpad">0</span></div>
+  <div class="si" id="sb-meeting" onclick="setNoteFilter('type:meeting',this)"><span class="ic" style="color:var(--blue)">◉</span>Meeting<span class="sbadge" id="nb-meeting">0</span></div>
+  <div class="si" id="sb-snippet" onclick="setNoteFilter('type:snippet',this)"><span class="ic" style="color:var(--teal)">⌨</span>Snippet<span class="sbadge" id="nb-snippet">0</span></div>
+  <div class="si" id="sb-idea" onclick="setNoteFilter('type:idea',this)"><span class="ic" style="color:var(--amber)">◎</span>Idea<span class="sbadge" id="nb-idea">0</span></div>
+  <div class="si" id="sb-plan" onclick="setNoteFilter('type:plan',this)"><span class="ic" style="color:var(--purple)">▦</span>Plan<span class="sbadge" id="nb-plan">0</span></div>
+  <div class="si" id="sb-note" onclick="setNoteFilter('type:note',this)"><span class="ic">○</span>Note<span class="sbadge" id="nb-note">0</span></div>
+  <div class="si" id="sb-graph" onclick="openGraphModal()"><span class="ic">⊙</span>Note Graph</div>
+  <div class="sl">Tags</div>
+  <div id="tag-tree"></div>
+  <div class="add-folder" onclick="openTagModal()"><span>+</span> New Tag</div>
+  <div class="sl">Folders</div>
+  <div id="folder-tree"></div>
+  <div class="add-folder" onclick="openFolderModal()"><span>+</span> New Folder</div>
+  <span id="sb-archive-badge" style="display:none">0</span>
+</div>
+
+<div class="resize-handle" id="sidebar-resize"></div>
+<!-- NUDGES + PANELS -->
+<div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+  <div class="nudge weekly" id="nudge-weekly">
+    <span class="nudge-text"><strong>Weekly Review</strong> — <span id="nudge-weekly-ct">0</span> unprocessed notes in your inbox.</span>
+    <button class="n-btn" onclick="showView('inbox');dismissNudge('weekly')">Clear Inbox →</button>
+    <button class="n-btn" onclick="dismissNudge('weekly')">Dismiss</button>
+    <button class="n-x" onclick="dismissNudge('weekly')">✕</button>
+  </div>
+  <div class="nudge overdue" id="nudge-aged">
+    <span class="nudge-text"><strong>Context Reminder</strong> — <span id="nudge-aged-ct">0</span> notes have been in inbox 24h+.</span>
+    <button class="n-btn" onclick="showView('inbox');startProcessor(true);dismissNudge('aged')">Review Now →</button>
+    <button class="n-btn" onclick="snoozeAged()">Remind Tomorrow</button>
+    <button class="n-x" onclick="dismissNudge('aged')">✕</button>
+  </div>
+
+  <div id="panels" style="flex:1;overflow:hidden;display:flex">
+    <!-- TASK PANEL -->
+    <div id="task-panel">
+      <div id="tp-header">
+        <h2>Tasks</h2>
+        <button class="add-task-btn" onclick="openCapture('task')">+ Add Task</button>
+        <button class="panel-collapse-btn" id="task-collapse-btn" onclick="toggleTaskPanel()" title="Collapse">‹</button>
+      </div>
+      <div id="task-scroll">
+        <div class="tsec" id="sec-ov"><div class="tsec-hdr" onclick="toggleSec('ov')"><span class="tsec-tog" id="tog-ov">▾</span><span class="tsec-name ov">Overdue</span><span class="tsec-ct" id="ct-ov">0</span></div><div class="tsec-body" id="body-ov"></div></div>
+        <div class="tsec" id="sec-td"><div class="tsec-hdr" onclick="toggleSec('td')"><span class="tsec-tog" id="tog-td">▾</span><span class="tsec-name td">Due Today</span><span class="tsec-ct" id="ct-td">0</span></div><div class="tsec-body" id="body-td"></div></div>
+        <div class="tsec" id="sec-up"><div class="tsec-hdr" onclick="toggleSec('up')"><span class="tsec-tog" id="tog-up">▾</span><span class="tsec-name up">Upcoming</span><span class="tsec-ct" id="ct-up">0</span></div><div class="tsec-body" id="body-up"></div></div>
+        <div class="tsec" id="sec-nd"><div class="tsec-hdr" onclick="toggleSec('nd')"><span class="tsec-tog" id="tog-nd">▾</span><span class="tsec-name nd">No Due Date</span><span class="tsec-ct" id="ct-nd">0</span></div><div class="tsec-body" id="body-nd"></div></div>
+      </div>
+      <div id="archive-link" onclick="showArchive()">View Archive (<span id="archive-ct">0</span>)</div>
+      <div id="email-drop-zone">
+        <span class="edz-icon">✉</span>
+        <span class="edz-label">Drop email → follow-up task</span>
+      </div>
+      <div class="drawer-tab" onclick="toggleTaskPanel()"><span class="drawer-label">Tasks</span></div>
+    </div>
+
+    <div class="resize-handle" id="task-resize"></div>
+    <!-- NOTES AREA -->
+    <div style="display:flex;flex:1;overflow:hidden;flex-direction:column">
+      <!-- inbox view -->
+      <div id="inbox-view">
+        <div id="inbox-header">
+          <div class="ih-top">
+            <div><div class="ih-title">Inbox</div><div class="ih-sub">Unprocessed notes — give them context before they become noise.</div></div>
+            <div class="ih-stats">
+              <div class="stat-chip"><div class="stat-n red" id="ist-total">0</div><div class="stat-l">Unprocessed</div></div>
+              <div class="stat-chip"><div class="stat-n amber" id="ist-aged">0</div><div class="stat-l">24h+ Old</div></div>
+              <div class="stat-chip"><div class="stat-n green" id="ist-today">0</div><div class="stat-l">Cleared Today</div></div>
+            </div>
+          </div>
+          <div class="ih-actions">
+            <button class="btn-p" id="proc-all-btn" onclick="startProcessor()">▶ Process Inbox</button>
+            <button class="btn-g" id="proc-aged-btn" onclick="startProcessor(true)">⚠ Aged First</button>
+            <button class="btn-d" onclick="discardAllInbox()">✕ Discard All</button>
+          </div>
+        </div>
+        <div id="inbox-grid-wrap"></div>
+        <div id="processor">
+          <div id="proc-hdr">
+            <button class="btn-gh" style="padding:5px 10px;font-size:11px" onclick="exitProcessor()">← Back</button>
+            <h3>Processing Inbox</h3>
+            <span id="proc-prog-txt"></span>
+            <button class="btn-gh" style="padding:5px 10px;font-size:11px" onclick="exitProcessor()">Stop</button>
+          </div>
+          <div class="prog-wrap"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+          <div id="proc-body">
+            <div id="proc-card">
+              <div class="pc-bar" id="pc-bar"></div>
+              <div class="pc-hdr"><div class="pc-tr"><span class="pc-tbadge" id="pc-tbadge"></span><span class="pc-age" id="pc-age"></span></div><div class="pc-ttl" id="pc-ttl"></div></div>
+              <div class="pc-bdy" id="pc-bdy"></div>
+              <div class="pc-acts">
+                <div class="pc-acts-lbl">What should this become?</div>
+                <div class="pc-grid">
+                  <div class="pc-field"><div class="pc-flbl">Change Type</div><select class="pc-sel" id="pc-type-sel"><option value="">— Keep as is —</option><option value="scratchpad">✦ Scratchpad</option><option value="meeting">◉ Meeting</option><option value="snippet">⌨ Snippet</option><option value="idea">◎ Idea</option><option value="plan">▦ Plan</option><option value="note">○ Note</option></select></div>
+                  <div class="pc-field"><div class="pc-flbl">Assign Folder</div><select class="pc-sel" id="pc-folder-sel"><option value="">— Unfiled —</option></select></div>
+                </div>
+                <div class="pc-btns">
+                  <button class="pc-btn pr" onclick="procApply()">✓ Apply & Next</button>
+                  <button class="pc-btn tk" onclick="procConvert()">→ Task</button>
+                  <button class="pc-btn dc" onclick="procDiscard()">✕ Discard</button>
+                  <button class="pc-btn sk" onclick="procSkip()">Skip →</button>
+                </div>
+              </div>
+            </div>
+            <div id="proc-done">
+              <div class="done-icon">✦</div>
+              <div class="done-title">Inbox Clear</div>
+              <div class="done-stats" id="done-stats"></div>
+              <div class="done-sub">All items processed.</div>
+              <button class="btn-gh" style="margin-top:8px;font-size:11px" onclick="exitProcessor()">← Back</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- notes list + editor -->
+      <div style="display:flex;flex:1;overflow:hidden" id="notes-area">
+        <div id="notes-list">
+          <div id="nl-header"><h3 id="nl-heading">All Notes</h3><button class="new-note-btn" onclick="openTypeSelector()">+ Add Note</button><button class="panel-collapse-btn" id="notes-collapse-btn" onclick="toggleNotesPanel()" title="Collapse">‹</button></div>
+          <div id="nl-scroll"></div>
+          <div class="drawer-tab" onclick="toggleNotesPanel()"><span class="drawer-label" id="notes-drawer-label">All Notes</span></div>
+        </div>
+        <div class="resize-handle" id="notes-resize"></div>
+        <div id="editor-panel">
+          <div id="ed-empty">
+            <div class="ee-icon">📝</div>
+            <div class="ee-title">Select or create a note</div>
+            <div class="ee-shortcuts"><span class="kbd">M</span> new note &nbsp;·&nbsp; <span class="kbd">S</span> scratchpad &nbsp;·&nbsp; <span class="kbd">N</span> task &nbsp;·&nbsp; <span class="kbd">/</span> search</div>
+          </div>
+          <div id="ed-wrap">
+            <div id="ed-header">
+              <button id="ed-back" onclick="navBack()" title="Back (Alt+←)">←</button>
+              <input id="ed-title" type="text" placeholder="Note title…" autocomplete="off">
+              <div class="ed-hdr-btns">
+                <button class="ed-btn" id="pin-btn" onclick="togglePin()">📌 Pin</button>
+                <button class="ed-btn" id="folder-btn" onclick="openAssignFolder()">⊡ Folder</button>
+                <button class="ed-btn" onclick="duplicateNote()">⧉ Dupe</button>
+                <button class="ed-btn danger" onclick="deleteCurrentNote()">✕</button>
+              </div>
+            </div>
+            <div id="meta-block"></div>
+            <div id="tags-block"></div>
+            <div id="ctx-prompt">
+              <span class="cp-text">⚠ No context yet — assign a folder to clear from inbox.</span>
+              <button class="cp-btn" onclick="openAssignFolder()">Assign folder</button>
+              <button class="cp-btn" onclick="dismissCtxPrompt()">Leave in inbox</button>
+            </div>
+            <div id="ed-toolbar">
+              <button class="tbb" id="tbb-bold" onclick="ec('bold')"><strong>B</strong></button>
+              <button class="tbb" id="tbb-italic" onclick="ec('italic')"><em>I</em></button>
+              <button class="tbb" id="tbb-underline" onclick="ec('underline')"><u>U</u></button>
+              <div class="tbb-sep"></div>
+              <button class="tbb" id="tbb-h1" onclick="eh(1)">H1</button>
+              <button class="tbb" id="tbb-h2" onclick="eh(2)">H2</button>
+              <button class="tbb" id="tbb-h3" onclick="eh(3)">H3</button>
+              <div class="tbb-sep"></div>
+              <button class="tbb" id="tbb-ul" onclick="ec('insertUnorderedList')">• List</button>
+              <button class="tbb" id="tbb-ol" onclick="ec('insertOrderedList')">1. List</button>
+              <button class="tbb tbb-accent" onclick="openExtractModal()" title="Convert list items to tasks">↗ Tasks</button>
+              <div class="tbb-sep"></div>
+              <button class="tbb" onclick="insertTable()">⊞ Table</button>
+              <button class="tbb" onclick="insertCode()">{ } Code</button>
+              <button class="tbb" onclick="ec('insertHorizontalRule')">— HR</button>
+              <div class="tbb-sep"></div>
+              <button class="tbb" onclick="eSub()" title="Subscript">X<sub style="font-size:0.7em">2</sub></button>
+              <button class="tbb" onclick="eSuper()" title="Superscript">X<sup style="font-size:0.7em">2</sup></button>
+              <select class="tbb tbb-sel" title="Font Size" onchange="eSize(this.value);this.value=''">
+                <option value="">A±</option>
+                <option value="0.8em">Small</option>
+                <option value="1em">Normal</option>
+                <option value="1.3em">Large</option>
+                <option value="1.65em">XL</option>
+              </select>
+              <button class="tbb tbb-color" title="Text Color" onclick="document.getElementById('ed-color-picker').click()">A<span class="color-dot" id="color-dot"></span></button>
+              <input type="color" id="ed-color-picker" style="position:fixed;opacity:0;width:0;height:0;pointer-events:none" onchange="eColor(this.value)">
+              <div class="tbb-sep"></div>
+              <button class="tbb" onclick="triggerWiki()">[[ Link</button>
+              <div class="autosave"><div class="asdot" id="asdot"></div><span id="aslbl">saved</span></div>
+            </div>
+            <div id="ed-scroll">
+              <div id="ed-content" contenteditable="true" spellcheck="true" data-placeholder="Start writing… type [[ to link a note"></div>
+              <div id="backlinks" style="display:none">
+                <div class="bl-hdr" onclick="toggleBacklinks()"><span class="bl-tog" id="bl-tog">▶</span><span>Linked From</span><span id="bl-ct" style="color:var(--text3);font-size:10px;margin-left:4px"></span></div>
+                <div id="bl-body" style="display:none"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ARCHIVE VIEW -->
+<div id="archive-view">
+  <div id="av-hdr"><h2>Archive</h2><button class="btn-gh" style="font-size:11px" onclick="hideArchive()">← Back</button><button class="btn-dr" style="font-size:11px" onclick="clearArchive()">Clear All</button></div>
+  <div id="av-list"></div>
+</div>
+
+<!-- TASK DETAIL MODAL -->
+<div class="mo" id="task-detail-modal" onclick="handleMoClick(event,'task-detail-modal')">
+  <div class="mb" style="width:420px">
+    <div class="mh"><h3>Task Details</h3><button class="mc" onclick="closeModal('task-detail-modal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg"><label class="fl">Title</label><input class="fi" id="td-title" type="text" autocomplete="off" onkeydown="if(event.key==='Enter')saveTaskDetail()"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Due Date</label><input class="fi" id="td-due" type="date"></div>
+        <div class="fg"><label class="fl">Recurrence</label><select class="fsel" id="td-recur"><option value="">None</option><option value="daily">Daily</option><option value="weekdays">Weekdays</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Notes</label><textarea class="fi" id="td-notes" style="height:80px;resize:vertical;font-family:var(--mono);font-size:12px" placeholder="Additional notes…"></textarea></div>
+      <div style="font-size:11px;color:var(--text3);padding:6px 0 2px">Created: <span id="td-created"></span></div>
+    </div>
+    <div class="mft"><span class="mhint">↵ save &nbsp;·&nbsp; esc dismiss</span><button class="btn-pr" onclick="saveTaskDetail()">Save</button></div>
+  </div>
+</div>
+
+<!-- CAPTURE MODAL -->
+<div class="mo" id="cap-modal" onclick="handleMoClick(event,'cap-modal')">
+  <div class="mb">
+    <div class="mh">
+      <h3>Quick Capture</h3>
+      <div style="display:flex;gap:6px;margin-right:8px">
+        <button class="ed-btn" id="cap-tab-task" onclick="switchCapTab('task')" style="font-size:10px;padding:3px 10px">Task</button>
+        <button class="ed-btn" id="cap-tab-note" onclick="switchCapTab('note')" style="font-size:10px;padding:3px 10px">Note</button>
+      </div>
+      <button class="mc" onclick="closeModal('cap-modal')">✕</button>
+    </div>
+    <div class="mbdy">
+      <div id="cap-task-form">
+        <div class="fg"><label class="fl">Title *</label><input class="fi" id="cap-task-title" type="text" placeholder="What needs to be done?" autocomplete="off"></div>
+        <div class="frow">
+          <div class="fg"><label class="fl">Due Date</label><input class="fi" id="cap-task-due" type="date"></div>
+          <div class="fg"><label class="fl">Recurrence</label><select class="fsel" id="cap-task-recur"><option value="">None</option><option value="daily">Daily</option><option value="weekdays">Weekdays</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></div>
+        </div>
+      </div>
+      <div id="cap-note-form" style="display:none">
+        <div class="fg"><label class="fl">Type</label>
+          <select class="fsel" id="cap-note-type">
+            <option value="scratchpad">✦ Scratchpad</option><option value="meeting">◉ Meeting</option><option value="snippet">⌨ Snippet</option><option value="idea">◎ Idea</option><option value="plan">▦ Plan</option><option value="note">○ Note</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Title (optional)</label><input class="fi" id="cap-note-title" type="text" placeholder="Note title…" autocomplete="off"></div>
+      </div>
+    </div>
+    <div class="mft"><span class="mhint">↵ create &nbsp;·&nbsp; esc dismiss</span><button class="btn-pr" id="cap-submit-btn" onclick="submitCapture()">Create Task</button></div>
+  </div>
+</div>
+
+<!-- TYPE SELECTOR -->
+<div class="mo" id="type-modal" onclick="handleMoClick(event,'type-modal')">
+  <div class="mb">
+    <div class="mh"><h3>New Note — Choose Type</h3><button class="mc" onclick="closeModal('type-modal')">✕</button></div>
+    <div class="mbdy"><div class="type-grid" id="type-grid"></div></div>
+    <div class="mft"><span class="mhint">Click a type to create immediately</span></div>
+  </div>
+</div>
+
+<!-- TAG MODAL -->
+<div class="mo" id="tag-modal" onclick="handleMoClick(event,'tag-modal')">
+  <div class="mb" style="width:320px">
+    <div class="mh"><h3>New Tag</h3><button class="mc" onclick="closeModal('tag-modal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg"><label class="fl">Tag Name</label><input class="fi" id="tag-name-inp" type="text" placeholder="e.g. Project X, Finance…" autocomplete="off" onkeydown="if(event.key==='Enter')submitTag()"></div>
+      <div class="fg"><label class="fl">Color</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="tag-color-palette" style="display:flex;gap:5px;flex-wrap:wrap;flex:1"></div>
+          <input type="color" id="tag-color-inp" style="width:32px;height:32px;border:none;background:none;cursor:pointer;padding:0;border-radius:4px">
+        </div>
+      </div>
+    </div>
+    <div class="mft"><span class="mhint">↵ create</span><button class="btn-pr" onclick="submitTag()">Create</button></div>
+  </div>
+</div>
+
+<!-- FOLDER MODAL -->
+<div class="mo" id="folder-modal" onclick="handleMoClick(event,'folder-modal')">
+  <div class="mb">
+    <div class="mh"><h3>New Folder</h3><button class="mc" onclick="closeModal('folder-modal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg"><label class="fl">Folder Name</label><input class="fi" id="folder-name-inp" type="text" placeholder="e.g. Projects, Work…" autocomplete="off"></div>
+      <div class="fg"><label class="fl">Parent Folder (optional)</label><select class="fsel" id="folder-parent-sel"><option value="">— Top level —</option></select></div>
+    </div>
+    <div class="mft"><span class="mhint">↵ create</span><button class="btn-pr" onclick="submitFolder()">Create</button></div>
+  </div>
+</div>
+
+<!-- ASSIGN FOLDER MODAL -->
+<div class="mo" id="assign-folder-modal" onclick="handleMoClick(event,'assign-folder-modal')">
+  <div class="mb" style="width:340px">
+    <div class="mh"><h3>Assign Folder</h3><button class="mc" onclick="closeModal('assign-folder-modal')">✕</button></div>
+    <div class="mbdy"><div class="fg"><label class="fl">Folder</label><select class="fsel" id="assign-folder-sel"><option value="">— Unfiled —</option></select></div></div>
+    <div class="mft"><span></span><button class="btn-pr" onclick="submitAssignFolder()">Assign</button></div>
+  </div>
+</div>
+
+<!-- CONVERT TO TASK MODAL -->
+<div class="mo" id="conv-task-modal" onclick="handleMoClick(event,'conv-task-modal')">
+  <div class="mb">
+    <div class="mh"><h3>Convert to Task</h3><button class="mc" onclick="closeModal('conv-task-modal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg"><label class="fl">Task Title</label><input class="fi" id="conv-task-title" type="text" placeholder="What needs to be done?" autocomplete="off"></div>
+      <div class="fg"><label class="fl">Due Date (optional)</label><input class="fi" id="conv-task-due" type="date"></div>
+      <div class="fg" style="font-size:11px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 9px">⚠ Source note will be deleted after conversion.</div>
+    </div>
+    <div class="mft"><span class="mhint">↵ confirm</span><button class="btn-pr" onclick="submitConvTask()">Create Task</button></div>
+  </div>
+</div>
+
+
+<!-- EXTRACT LIST TO TASKS MODAL -->
+<div class="mo" id="extract-modal" onclick="handleMoClick(event,'extract-modal')">
+  <div class="mb" style="width:480px">
+    <div class="mh"><h3>Extract List to Tasks</h3><button class="mc" onclick="closeModal('extract-modal')">✕</button></div>
+    <div class="mbdy" style="padding-bottom:0">
+      <div class="extract-setall">
+        <span class="fl" style="white-space:nowrap">Set all to:</span>
+        <input class="fi" id="extract-all-due" type="date" onchange="setAllExtractDates(this.value)">
+        <button class="btn-gh" style="font-size:11px;padding:4px 8px;white-space:nowrap" onclick="setAllExtractDates('')">Clear all</button>
+      </div>
+      <div id="extract-rows"></div>
+    </div>
+    <div class="mft"><span class="mhint">↵ create</span><button class="btn-pr" onclick="submitExtract()">Create Tasks</button></div>
+  </div>
+</div>
+
+<!-- EMAIL FOLLOW-UP MODAL -->
+<div class="mo" id="email-followup-modal" onclick="handleMoClick(event,'email-followup-modal')">
+  <div class="mb" style="width:380px">
+    <div class="mh"><h3>Email Follow-up Task</h3><button class="mc" onclick="closeModal('email-followup-modal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg"><label class="fl">Task Title</label><input class="fi" id="ef-title" type="text" autocomplete="off" onkeydown="if(event.key==='Enter')submitEmailFollowUp()"></div>
+      <div class="fg"><label class="fl">Deadline *</label><input class="fi" id="ef-due" type="date" onkeydown="if(event.key==='Enter')submitEmailFollowUp()"></div>
+      <div class="fg" id="ef-link-row" style="display:none"><label class="fl">Email Link</label><div id="ef-link-display" style="font-size:11px;color:var(--text3);font-family:var(--mono);word-break:break-all;padding:5px 0;line-height:1.4"></div></div>
+    </div>
+    <div class="mft"><span class="mhint">↵ create &nbsp;·&nbsp; esc dismiss</span><button class="btn-pr" onclick="submitEmailFollowUp()">Create Task</button></div>
+  </div>
+</div>
+
+<!-- NOTE GRAPH MODAL -->
+<div class="mo" id="graph-modal" onclick="handleMoClick(event,'graph-modal')">
+  <div class="graph-mb">
+    <div class="mh"><h3>Note Graph</h3><button class="mc" onclick="closeModal('graph-modal')">✕</button></div>
+    <canvas id="graph-canvas"></canvas>
+    <div class="mft">
+      <span class="mhint" id="graph-hint">Click a node to open · Drag to rearrange</span>
+      <button class="btn-gh" onclick="resetGraphLayout()">↺ Reset Layout</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADING STYLES MODAL -->
+<div class="mo" id="heading-styles-modal" onclick="handleMoClick(event,'heading-styles-modal')">
+  <div class="mb" style="width:400px">
+    <div class="mh"><h3>Heading Styles</h3><button class="mc" onclick="closeModal('heading-styles-modal')">✕</button></div>
+    <div class="mbdy">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Leave fields empty to use theme defaults.</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr><th style="text-align:left;color:var(--text3);font-size:11px;padding-bottom:6px;font-family:var(--sans);font-weight:700;letter-spacing:.08em;text-transform:uppercase">Level</th><th style="text-align:left;color:var(--text3);font-size:11px;padding-bottom:6px;font-family:var(--sans);font-weight:700;letter-spacing:.08em;text-transform:uppercase">Color (hex)</th><th style="text-align:left;color:var(--text3);font-size:11px;padding-bottom:6px;font-family:var(--sans);font-weight:700;letter-spacing:.08em;text-transform:uppercase">Size (px)</th><th></th></tr></thead>
+        <tbody>
+          <tr style="border-top:1px solid var(--border)">
+            <td style="padding:8px 8px 8px 0;font-family:var(--sans);font-weight:700;font-size:15px">H1</td>
+            <td style="padding:8px"><input class="fi" id="hs-h1-color" type="text" placeholder="#e8e6e0" style="width:100%;font-family:var(--mono);font-size:12px"></td>
+            <td style="padding:8px"><input class="fi" id="hs-h1-size" type="number" min="12" max="60" placeholder="22" style="width:100%;font-family:var(--mono);font-size:12px"></td>
+            <td style="padding:8px"><button class="btn-gh" style="font-size:10px;padding:3px 7px;white-space:nowrap" onclick="resetHeading('h1')">↺ Reset</button></td>
+          </tr>
+          <tr style="border-top:1px solid var(--border)">
+            <td style="padding:8px 8px 8px 0;font-family:var(--sans);font-weight:700;font-size:13px">H2</td>
+            <td style="padding:8px"><input class="fi" id="hs-h2-color" type="text" placeholder="#e8e6e0" style="width:100%;font-family:var(--mono);font-size:12px"></td>
+            <td style="padding:8px"><input class="fi" id="hs-h2-size" type="number" min="12" max="60" placeholder="18" style="width:100%;font-family:var(--mono);font-size:12px"></td>
+            <td style="padding:8px"><button class="btn-gh" style="font-size:10px;padding:3px 7px;white-space:nowrap" onclick="resetHeading('h2')">↺ Reset</button></td>
+          </tr>
+          <tr style="border-top:1px solid var(--border)">
+            <td style="padding:8px 8px 8px 0;font-family:var(--sans);font-weight:700;font-size:12px">H3</td>
+            <td style="padding:8px"><input class="fi" id="hs-h3-color" type="text" placeholder="#e8e6e0" style="width:100%;font-family:var(--mono);font-size:12px"></td>
+            <td style="padding:8px"><input class="fi" id="hs-h3-size" type="number" min="12" max="60" placeholder="15" style="width:100%;font-family:var(--mono);font-size:12px"></td>
+            <td style="padding:8px"><button class="btn-gh" style="font-size:10px;padding:3px 7px;white-space:nowrap" onclick="resetHeading('h3')">↺ Reset</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mft"><span class="mhint">Applies to all notes immediately</span><button class="btn-pr" onclick="saveHeadingStyles()">Apply</button></div>
+  </div>
+</div>
+
+<!-- TEMPLATE EDITOR MODAL -->
+<div class="mo" id="tmpl-modal" onclick="handleMoClick(event,'tmpl-modal')">
+  <div class="mb" style="width:580px;max-width:95vw">
+    <div class="mh"><h3>Edit Note Templates</h3><button class="mc" onclick="closeModal('tmpl-modal')">✕</button></div>
+    <div class="mbdy" style="padding-top:8px">
+      <div class="fg" style="margin-bottom:8px">
+        <label class="fl">Note Type</label>
+        <select class="fsel" id="tmpl-type-sel" onchange="switchTemplateType(this.value)">
+          <option value="scratchpad">✦ Scratchpad</option>
+          <option value="meeting">◉ Meeting</option>
+          <option value="snippet">⌨ Snippet</option>
+          <option value="idea">◎ Idea</option>
+          <option value="plan">▦ Plan</option>
+          <option value="note">○ Note</option>
+        </select>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Pre-fills new notes of this type. Leave blank for an empty note.</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;padding:4px 0 6px;border-bottom:1px solid var(--border);margin-bottom:6px">
+        <button class="tbb" onclick="tmplEc('bold')"><strong>B</strong></button>
+        <button class="tbb" onclick="tmplEc('italic')"><em>I</em></button>
+        <button class="tbb" onclick="tmplEh(2)">H2</button>
+        <button class="tbb" onclick="tmplEh(3)">H3</button>
+        <button class="tbb" onclick="tmplEc('insertUnorderedList')">• List</button>
+        <button class="tbb" onclick="tmplEc('insertOrderedList')">1. List</button>
+        <button class="tbb" onclick="tmplInsertCode()">{ } Code</button>
+        <button class="tbb danger" onclick="resetTemplateToDefault()" style="margin-left:auto">↺ Reset</button>
+      </div>
+      <div id="tmpl-editor" contenteditable="true" spellcheck="false" style="min-height:160px;max-height:300px;overflow-y:auto;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;line-height:1.6;outline:none;background:var(--bg)"></div>
+    </div>
+    <div class="mft"><span class="mhint">Applies to new notes only</span><button class="btn-pr" onclick="saveCurrentTemplate()">Save Template</button></div>
+  </div>
+</div>
+
+<!-- NEW NOTEBOOK MODAL -->
+<div class="mo" id="nb-modal" onclick="handleMoClick(event,'nb-modal')">
+  <div class="mb" style="width:320px">
+    <div class="mh"><h3>New Notebook</h3><button class="mc" onclick="closeModal('nb-modal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg">
+        <label class="fl">Notebook Name</label>
+        <input class="fi" id="nb-name-inp" type="text" placeholder="e.g. Work, Personal…" autocomplete="off" onkeydown="if(event.key==='Enter')submitNewNotebook()">
+      </div>
+    </div>
+    <div class="mft"><span class="mhint">↵ create</span><button class="btn-pr" onclick="submitNewNotebook()">Create</button></div>
+  </div>
+</div>
+
+<!-- RENAME NOTEBOOK MODAL -->
+<div class="mo" id="nb-rename-modal" onclick="handleMoClick(event,'nb-rename-modal')">
+  <div class="mb" style="width:320px">
+    <div class="mh"><h3>Rename Notebook</h3><button class="mc" onclick="closeModal('nb-rename-modal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg">
+        <label class="fl">Notebook Name</label>
+        <input class="fi" id="nb-rename-inp" type="text" autocomplete="off" onkeydown="if(event.key==='Enter')submitRenameNotebook()">
+      </div>
+    </div>
+    <div class="mft"><span class="mhint">↵ save</span><button class="btn-pr" onclick="submitRenameNotebook()">Save</button></div>
+  </div>
+</div>
+
+<!-- TAG PICKER -->
+<div id="tag-picker"></div>
+<!-- WIKI AUTOCOMPLETE -->
+<div id="wiki-ac"></div>
+<!-- FLOAT TOOLBAR -->
+<div id="float-tb">
+  <button class="ftb" onclick="ec('bold')"><strong>B</strong></button>
+  <button class="ftb" onclick="ec('italic')"><em>I</em></button>
+  <button class="ftb" onclick="ec('underline')"><u>U</u></button>
+  <button class="ftb accent" onclick="createTaskFromSel()">→ Task</button>
+  <button class="ftb" onclick="triggerWiki()">[[</button>
+</div>
+<!-- CONFIRM MODAL -->
+<div class="mo" id="confirm-modal" onclick="handleMoClick(event,'confirm-modal')">
+  <div class="mb" style="width:340px">
+    <div class="mh"><h3 id="confirm-modal-title">Confirm</h3><button class="mc" onclick="_confirmCancel()">✕</button></div>
+    <div class="mbdy"><p id="confirm-modal-msg" style="font-size:13px;color:var(--text2);line-height:1.5"></p></div>
+    <div class="mft"><button class="btn-gh" onclick="_confirmCancel()">Cancel</button><button class="btn-dr" onclick="_confirmOk()">Delete</button></div>
+  </div>
+</div>
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script src="js/resize.js"></script>
+<script src="js/config.js"></script>
+<script src="js/filestore.js"></script>
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/notebooks.js"></script>
+<script src="js/tasks.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/folders.js"></script>
+<script src="js/tags.js"></script>
+<script src="js/inbox.js"></script>
+<script src="js/search.js"></script>
+<script src="js/nudges.js"></script>
+<script src="js/archive.js"></script>
+<script src="js/modals.js"></script>
+<script src="js/shortcuts.js"></script>
+<script src="js/graph.js"></script>
+<script src="js/tour.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
