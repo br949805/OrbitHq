@@ -133,7 +133,7 @@ async function createNotebook(name, handle) {
       tasks:[], archived:[], notes:[], folders:[], tags:[],
       collapsed:{}, noteFilter:'all', activeNoteId:null,
       navHistory:[], blOpen:false, dismissedCtx:[],
-      settings:{ archiveDelay:7, wordThreshold:50, reviewDay:1, theme:'default', templates:{}, headingStyles:{} },
+      settings:{ archiveDelay:7, wordThreshold:50, reviewDay:1, theme:'clean-dark', templates:{}, headingStyles:{} },
       session:{ lastWeekly:null, agedSnoozedUntil:null, clearedToday:0, clearedDate:null }
     });
   }
@@ -263,7 +263,7 @@ async function switchNotebook(id) {
     S.tasks = []; S.archived = []; S.notes = []; S.folders = []; S.tags = [];
     S.collapsed = {}; S.noteFilter = 'all'; S.activeNoteId = null;
     S.navHistory = []; S.blOpen = false; S.dismissedCtx = [];
-    S.settings = { archiveDelay:7, wordThreshold:50, reviewDay:1, theme:'default', fontSize:'default', templates:{}, headingStyles:{} };
+    S.settings = { archiveDelay:7, wordThreshold:50, reviewDay:1, theme:'clean-dark', fontSize:'default', templates:{}, headingStyles:{} };
     S.session = { lastWeekly:null, agedSnoozedUntil:null, clearedToday:0, clearedDate:null };
     await loadAsync();
   }

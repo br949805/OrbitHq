@@ -11,6 +11,8 @@
 <link rel="stylesheet" href="css/sidebar.css">
 <link rel="stylesheet" href="css/nudges.css">
 <link rel="stylesheet" href="css/tasks.css">
+<link rel="stylesheet" href="css/followups.css">
+<link rel="stylesheet" href="css/contacts.css">
 <link rel="stylesheet" href="css/notes.css">
 <link rel="stylesheet" href="css/editor.css">
 <link rel="stylesheet" href="css/inbox.css">
@@ -129,6 +131,7 @@
   <div class="sl" style="margin-top:0">Views</div>
   <div class="si active" id="sb-dashboard" onclick="showView('dashboard',this)"><span class="ic">▦</span>Dashboard<span class="sbadge" id="sb-task-badge">0</span></div>
   <div class="si" id="sb-inbox-si" onclick="showView('inbox',this)"><span class="ic" style="color:var(--red)">⊡</span>Inbox<span class="sbadge red" id="sb-inbox-badge">0</span></div>
+  <div class="si" id="sb-fu" onclick="showView('dashboard',this);setTimeout(()=>setFuMode('full'),50)"><span class="ic" style="color:var(--amber)">↩</span>Follow Ups<span class="sbadge" id="sb-fu-badge">0</span></div>
   <div class="sl">Notes</div>
   <div class="si" id="sb-all" onclick="setNoteFilter('all',this)"><span class="ic">◈</span>All Notes<span class="sbadge" id="nb-all">0</span></div>
   <div class="si" id="sb-pinned" onclick="setNoteFilter('pinned',this)"><span class="ic" style="color:var(--accent)">⊙</span>Pinned<span class="sbadge" id="nb-pinned">0</span></div>
@@ -146,6 +149,9 @@
   <div id="folder-tree"></div>
   <div class="add-folder" onclick="openFolderModal()"><span>+</span> New Folder</div>
   <span id="sb-archive-badge" style="display:none">0</span>
+  <div class="sb-contacts-section">
+    <div class="si" id="sb-contacts-nav" onclick="showContacts()"><span class="ic" style="color:var(--green)">⊛</span>Contacts<span class="sbadge" id="ct-badge">0</span></div>
+  </div>
 </div>
 
 <div class="resize-handle" id="sidebar-resize"></div>
@@ -172,11 +178,23 @@
         <button class="add-task-btn" onclick="openCapture('task')">+ Add Task</button>
         <button class="panel-collapse-btn" id="task-collapse-btn" onclick="toggleTaskPanel()" title="Collapse">‹</button>
       </div>
-      <div id="task-scroll">
-        <div class="tsec" id="sec-ov"><div class="tsec-hdr" onclick="toggleSec('ov')"><span class="tsec-tog" id="tog-ov">▾</span><span class="tsec-name ov">Overdue</span><span class="tsec-ct" id="ct-ov">0</span></div><div class="tsec-body" id="body-ov"></div></div>
-        <div class="tsec" id="sec-td"><div class="tsec-hdr" onclick="toggleSec('td')"><span class="tsec-tog" id="tog-td">▾</span><span class="tsec-name td">Due Today</span><span class="tsec-ct" id="ct-td">0</span></div><div class="tsec-body" id="body-td"></div></div>
-        <div class="tsec" id="sec-up"><div class="tsec-hdr" onclick="toggleSec('up')"><span class="tsec-tog" id="tog-up">▾</span><span class="tsec-name up">Upcoming</span><span class="tsec-ct" id="ct-up">0</span></div><div class="tsec-body" id="body-up"></div></div>
-        <div class="tsec" id="sec-nd"><div class="tsec-hdr" onclick="toggleSec('nd')"><span class="tsec-tog" id="tog-nd">▾</span><span class="tsec-name nd">No Due Date</span><span class="tsec-ct" id="ct-nd">0</span></div><div class="tsec-body" id="body-nd"></div></div>
+      <div id="task-fu-split">
+        <div id="task-scroll">
+          <div class="tsec" id="sec-ov"><div class="tsec-hdr" onclick="toggleSec('ov')"><span class="tsec-tog" id="tog-ov">▾</span><span class="tsec-name ov">Overdue</span><span class="tsec-ct" id="ct-ov">0</span></div><div class="tsec-body" id="body-ov"></div></div>
+          <div class="tsec" id="sec-td"><div class="tsec-hdr" onclick="toggleSec('td')"><span class="tsec-tog" id="tog-td">▾</span><span class="tsec-name td">Due Today</span><span class="tsec-ct" id="ct-td">0</span></div><div class="tsec-body" id="body-td"></div></div>
+          <div class="tsec" id="sec-up"><div class="tsec-hdr" onclick="toggleSec('up')"><span class="tsec-tog" id="tog-up">▾</span><span class="tsec-name up">Upcoming</span><span class="tsec-ct" id="ct-up">0</span></div><div class="tsec-body" id="body-up"></div></div>
+          <div class="tsec" id="sec-nd"><div class="tsec-hdr" onclick="toggleSec('nd')"><span class="tsec-tog" id="tog-nd">▾</span><span class="tsec-name nd">No Due Date</span><span class="tsec-ct" id="ct-nd">0</span></div><div class="tsec-body" id="body-nd"></div></div>
+        </div>
+        <!-- FOLLOW UP PANEL -->
+        <div id="fu-panel">
+          <div id="fu-header">
+            <h3>↩ Follow Ups</h3>
+            <button class="add-fu-btn" onclick="openFuCapture()">+ Add</button>
+            <button class="fu-icon-btn" id="fu-exp-btn" onclick="toggleFuExpand()" title="Expand follow ups">⤢</button>
+            <button class="fu-icon-btn" id="fu-col-btn" onclick="toggleFuCollapse()" title="Collapse follow ups">▼</button>
+          </div>
+          <div id="fu-scroll"><div id="fu-body"></div></div>
+        </div>
       </div>
       <div id="archive-link" onclick="showArchive()">View Archive (<span id="archive-ct">0</span>)</div>
       <div id="email-drop-zone">
@@ -322,6 +340,19 @@
     </div>
   </div>
 </div>
+</div>
+
+<!-- CONTACTS VIEW -->
+<div id="contacts-view">
+  <div id="cv-hdr">
+    <h2>Contacts</h2>
+    <input id="cv-search" type="text" placeholder="Search…" autocomplete="off" oninput="renderContactsView(this.value)">
+    <button class="btn-pr" onclick="openAddContactModal()">+ Add Contact</button>
+    <button class="btn-gh" style="font-size:11px" onclick="hideContacts()">← Back</button>
+  </div>
+  <div id="cv-body">
+    <div id="cv-list"></div>
+  </div>
 </div>
 
 <!-- ARCHIVE VIEW -->
@@ -576,6 +607,50 @@
   </div>
 </div>
 
+<!-- FOLLOW UP CAPTURE MODAL -->
+<div class="mo" id="fu-modal" onclick="handleMoClick(event,'fu-modal')">
+  <div class="mb" style="width:420px">
+    <div class="mh"><h3>Add Follow Up</h3><button class="mc" onclick="closeModal('fu-modal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg"><label class="fl">What are you waiting for? *</label><input class="fi" id="fu-title-inp" type="text" placeholder="e.g. Send me the Q1 report" autocomplete="off" onkeydown="if(event.key==='Enter')submitFuCapture()"></div>
+      <div class="fg">
+        <label class="fl">Who is responsible?</label>
+        <div class="fu-who-wrap">
+          <input class="fi" id="fu-who-inp" type="text" placeholder="Name — type to search contacts…" autocomplete="off" oninput="onFuWhoInput(this)" onkeydown="if(event.key==='Escape')hideFuAC()">
+          <input type="hidden" id="fu-who-id">
+          <div id="fu-who-ac"></div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Expected by</label><input class="fi" id="fu-due-inp" type="date"></div>
+      <div class="fg"><label class="fl">Notes</label><textarea class="fi" id="fu-notes-inp" style="height:60px;resize:vertical;font-family:var(--mono);font-size:12px" placeholder="Additional context…"></textarea></div>
+    </div>
+    <div class="mft"><span class="mhint">↵ add &nbsp;·&nbsp; esc dismiss</span><button class="btn-pr" onclick="submitFuCapture()">Add Follow Up</button></div>
+  </div>
+</div>
+
+<!-- CONTACT ADD/EDIT MODAL -->
+<div class="mo" id="contact-modal" onclick="handleMoClick(event,'contact-modal')">
+  <div class="mb" style="width:440px">
+    <div class="mh"><h3 id="contact-modal-title">New Contact</h3><button class="mc" onclick="closeModal('contact-modal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg"><label class="fl">Name *</label><input class="fi" id="contact-name-inp" type="text" placeholder="Full name" autocomplete="off" onkeydown="if(event.key==='Enter')submitContactModal()"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Email</label><input class="fi" id="contact-email-inp" type="email" placeholder="name@example.com" autocomplete="off"></div>
+        <div class="fg"><label class="fl">Phone</label><input class="fi" id="contact-phone-inp" type="text" placeholder="+1 555 000 0000" autocomplete="off"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Organization</label><input class="fi" id="contact-org-inp" type="text" placeholder="Company / org" autocomplete="off"></div>
+        <div class="fg"><label class="fl">Role / Title</label><input class="fi" id="contact-role-inp" type="text" placeholder="Job title" autocomplete="off"></div>
+      </div>
+      <div class="fg"><label class="fl">Notes</label><textarea class="fi" id="contact-notes-inp" style="height:60px;resize:vertical;font-family:var(--mono);font-size:12px" placeholder="Additional notes…"></textarea></div>
+    </div>
+    <div class="mft"><span class="mhint">↵ save &nbsp;·&nbsp; esc dismiss</span><button class="btn-pr" onclick="submitContactModal()">Save</button></div>
+  </div>
+</div>
+
+<!-- ATTENDEE PICKER -->
+<div id="attendee-picker"></div>
+
 <!-- TAG PICKER -->
 <div id="tag-picker"></div>
 <!-- WIKI AUTOCOMPLETE -->
@@ -606,6 +681,8 @@
 <script src="js/utils.js"></script>
 <script src="js/notebooks.js"></script>
 <script src="js/tasks.js"></script>
+<script src="js/contacts.js"></script>
+<script src="js/followups.js"></script>
 <script src="js/notes.js"></script>
 <script src="js/editor.js"></script>
 <script src="js/folders.js"></script>

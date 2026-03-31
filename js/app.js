@@ -70,8 +70,11 @@ async function _continueBoot() {
   applyHeadingStyles();
   updateNotebookStatusUI();
   renderNotebookSwitcher();
+  _applyFuMode();
+  _updateContactBadge();
   runAutoArchive();
   renderTasks();
+  renderFollowUps();
   renderNotesList();
   renderFolderTree();
   initEmailDrop();

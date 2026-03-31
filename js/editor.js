@@ -19,7 +19,7 @@ function defaultMeta(type) {
     const now = new Date();
     const hh  = String(now.getHours()).padStart(2, '0');
     const mm  = String(Math.round(now.getMinutes() / 15) * 15 % 60).padStart(2, '0');
-    return { dateTime: todayISO() + 'T' + hh + ':' + mm, attendees:'', decisions:'', project:'' };
+    return { dateTime: todayISO() + 'T' + hh + ':' + mm, attendeeIds:[], decisions:'', project:'' };
   }
   if (type === 'snippet') return { dateCaptured:todayISO(), language:'', sourceUrl:'', context:'' };
   if (type === 'idea')    return { dateCaptured:todayISO(), status:'Raw', category:'' };
@@ -122,7 +122,7 @@ function renderMetadata(note) {
   if (note.type === 'meeting') {
     grid.appendChild(mf('Meeting / Project', 'text', m.project || '', v => smf('project', v)));
     grid.appendChild(mf('Date', 'date', m.dateTime ? m.dateTime.slice(0, 10) : '', v => smf('dateTime', v)));
-    grid.appendChild(mf('Attendees', 'text', m.attendees || '', v => smf('attendees', v), 'e.g. Alice, Bob'));
+    grid.appendChild(buildAttendeeField(note));
   } else if (note.type === 'snippet') {
     grid.appendChild(mf('Language / Tech', 'text', m.language || '', v => smf('language', v), 'Python, SQL…'));
     grid.appendChild(mf('Source URL', 'url', m.sourceUrl || '', v => smf('sourceUrl', v), 'https://…'));
@@ -138,6 +138,7 @@ function renderMetadata(note) {
   }
   block.innerHTML = ''; block.appendChild(grid);
 }
+
 
 // ── Autosave ─────────────────────────────────────────────────
 

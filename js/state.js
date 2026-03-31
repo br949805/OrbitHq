@@ -8,15 +8,16 @@ function setStorageKey(key) { _SK = key; }
 
 let S = {
   tasks: [], archived: [], notes: [], folders: [], tags: [],
+  contacts: [], followups: [], fuArchived: [], fuPanelMode: 'normal',
   collapsed: {}, noteFilter: 'all', activeNoteId: null,
   navHistory: [], blOpen: false, dismissedCtx: [],
-  settings: { archiveDelay:7, wordThreshold:50, reviewDay:1, theme:'default', templates:{} },
+  settings: { archiveDelay:7, wordThreshold:50, reviewDay:1, theme:'clean-dark', templates:{} },
   session: { lastWeekly:null, agedSnoozedUntil:null, clearedToday:0, clearedDate:null }
 };
 
 function normalizeState() {
-  if (!S.settings)       S.settings     = { archiveDelay:7, wordThreshold:50, reviewDay:1, theme:'default' };
-  if (!S.settings.theme)     S.settings.theme     = 'default';
+  if (!S.settings)       S.settings     = { archiveDelay:7, wordThreshold:50, reviewDay:1, theme:'clean-dark' };
+  if (!S.settings.theme)     S.settings.theme     = 'clean-dark';
   if (!S.settings.templates) S.settings.templates = {};
   if (!S.settings.headingStyles) S.settings.headingStyles = {};
   if (!S.settings.fontSize)      S.settings.fontSize      = 'default';
@@ -24,6 +25,10 @@ function normalizeState() {
   S.notes.forEach(n => { if (!n.tags) n.tags = []; });
   if (!S.session)        S.session      = { lastWeekly:null, agedSnoozedUntil:null, clearedToday:0, clearedDate:null };
   if (!S.dismissedCtx)   S.dismissedCtx = [];
+  if (!S.contacts)       S.contacts     = [];
+  if (!S.followups)      S.followups    = [];
+  if (!S.fuArchived)     S.fuArchived   = [];
+  if (!S.fuPanelMode)    S.fuPanelMode  = 'normal';
 }
 
 function loadSync() {

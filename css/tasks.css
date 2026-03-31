@@ -6,7 +6,8 @@
 #tp-header h2{font-family:var(--sans);font-size:15px;font-weight:700;flex:1}
 .add-task-btn{background:none;border:1px dashed var(--border2);border-radius:var(--r);color:var(--text3);font-size:12px;padding:3px 8px;cursor:pointer;font-family:var(--mono);transition:all var(--t)}
 .add-task-btn:hover{border-color:var(--accent);color:var(--accent)}
-#task-scroll{flex:1;overflow-y:auto;padding:4px 0 16px}
+/* #task-scroll flex/overflow managed by #task-fu-split in followups.css */
+#task-scroll{overflow-y:auto;padding:4px 0 16px}
 .tsec{margin-bottom:2px}
 .tsec-hdr{display:flex;align-items:center;gap:7px;padding:5px 14px;cursor:pointer;user-select:none;transition:background var(--t)}
 .tsec-hdr:hover{background:var(--bg3)}

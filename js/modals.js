@@ -307,7 +307,7 @@ function exportData() {
 
 function clearAllData() {
   // Clear only the active notebook's data.
-  S = { tasks:[], archived:[], notes:[], folders:[], collapsed:{}, noteFilter:'all', activeNoteId:null, navHistory:[], blOpen:false, dismissedCtx:[], settings:{ archiveDelay:7, wordThreshold:50, reviewDay:1, theme:'default', templates:{} }, session:{ lastWeekly:null, agedSnoozedUntil:null, clearedToday:0, clearedDate:null } };
+  S = { tasks:[], archived:[], notes:[], folders:[], tags:[], contacts:[], followups:[], fuArchived:[], fuPanelMode:'normal', collapsed:{}, noteFilter:'all', activeNoteId:null, navHistory:[], blOpen:false, dismissedCtx:[], settings:{ archiveDelay:7, wordThreshold:50, reviewDay:1, theme:'clean-dark', templates:{} }, session:{ lastWeekly:null, agedSnoozedUntil:null, clearedToday:0, clearedDate:null } };
   save(); location.reload();
 }
 
