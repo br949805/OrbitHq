@@ -114,7 +114,7 @@ function exitProcessor() {
 function populateProcFolders() {
   const sel = document.getElementById('pc-folder-sel'); const cur = sel.value;
   sel.innerHTML = '<option value="">— Unfiled —</option>';
-  S.folders.forEach(f => { const o = document.createElement('option'); o.value = f.id; o.textContent = (f.parentId ? '  ↳ ' : '') + f.name; sel.appendChild(o); });
+  populateFolderSelect(sel, cur);
   sel.value = cur;
 }
 

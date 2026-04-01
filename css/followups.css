@@ -62,19 +62,6 @@
   text-transform: uppercase;
   margin: 0;
 }
-.add-fu-btn {
-  background: none;
-  border: 1px dashed var(--border2);
-  border-radius: var(--r);
-  color: var(--text3);
-  font-size: 11px;
-  padding: 2px 7px;
-  cursor: pointer;
-  font-family: var(--mono);
-  transition: all var(--t);
-  flex-shrink: 0;
-}
-.add-fu-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 .fu-icon-btn {
   background: none;

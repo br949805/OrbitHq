@@ -3,6 +3,20 @@
 // backlinks, float toolbar, autosave, and editor event wiring.
 // ──────────────────────────────────────────────────────────────
 
+const SLASH_COMMANDS = [
+  { icon:'H1', label:'Heading 1',    keywords:['heading','h1','title','large'],        cmd:'h1' },
+  { icon:'H2', label:'Heading 2',    keywords:['heading','h2','subtitle'],             cmd:'h2' },
+  { icon:'H3', label:'Heading 3',    keywords:['heading','h3','small'],                cmd:'h3' },
+  { icon:'≡',  label:'Bullet list',  keywords:['list','bullet','ul','unordered'],      cmd:'ul' },
+  { icon:'1.', label:'Ordered list', keywords:['list','number','ol','ordered'],        cmd:'ol' },
+  { icon:'"',  label:'Blockquote',   keywords:['quote','blockquote'],                  cmd:'blockquote' },
+  { icon:'<>', label:'Code block',   keywords:['code','pre','block','snippet'],        cmd:'code' },
+  { icon:'⊞',  label:'Table',        keywords:['table','grid','columns'],              cmd:'table' },
+  { icon:'—',  label:'Divider',      keywords:['divider','hr','rule','line','sep'],    cmd:'hr' },
+  { icon:'ℹ',  label:'Callout',      keywords:['callout','info','note','alert','box'], cmd:'callout' },
+  { icon:'☐',  label:'Task',         keywords:['task','todo','checkbox','check'],      cmd:'task' },
+];
+
 // ── Note CRUD ────────────────────────────────────────────────
 
 function createNote(type, title = '') {
@@ -67,6 +81,13 @@ function openNote(id, pushHistory = true) {
   document.getElementById('ed-back').classList.toggle('vis', S.navHistory.length > 0);
   document.getElementById('ed-title').value = note.title || '';
   document.getElementById('ed-content').innerHTML = note.content || '';
+  // Sync inline task done states and due dates after content load
+  document.getElementById('ed-content').querySelectorAll('.task-item[data-task-id]').forEach(el => {
+    const t = S.tasks.find(x => x.id === el.dataset.taskId);
+    el.classList.toggle('ti-done', !!(t && t.completedAt));
+    const dueInp = el.querySelector('.ti-due-inp');
+    if (dueInp && t) dueInp.value = t.due || '';
+  });
   renderMetadata(note);
   const fn = S.folders.find(f => f.id === note.folderId);
   document.getElementById('folder-btn').textContent = fn ? '📁 ' + fn.name : '⊡ Folder';
@@ -77,6 +98,9 @@ function openNote(id, pushHistory = true) {
   renderBacklinks(note);
   document.querySelectorAll('#ed-content .wiki-link').forEach(a => {
     a.onclick = (e) => { e.preventDefault(); const tid = a.dataset.noteId; if (tid) openNote(tid); };
+  });
+  document.querySelectorAll('#ed-content .contact-link').forEach(a => {
+    a.onclick = (e) => { e.preventDefault(); showView('contacts'); };
   });
 }
 
@@ -146,10 +170,22 @@ function scheduleAutosave() {
   showSaving(); clearTimeout(asTimer);
   asTimer = setTimeout(() => {
     const n = getNote(S.activeNoteId); if (!n) return;
-    n.content   = document.getElementById('ed-content').innerHTML;
+    // Sync inline task titles and due dates from editor content
+    const edContentEl = document.getElementById('ed-content');
+    const presentIds = new Set([...edContentEl.querySelectorAll('.task-item[data-task-id]')].map(el => el.dataset.taskId));
+    edContentEl.querySelectorAll('.task-item[data-task-id]').forEach(el => {
+      const t = S.tasks.find(x => x.id === el.dataset.taskId);
+      if (t) {
+        const b = el.querySelector('.ti-body'); if (b) t.title = b.textContent.trim();
+        const d = el.querySelector('.ti-due-inp'); if (d) t.due = d.value || null;
+      }
+    });
+    // Remove tasks that were deleted from this note's editor content
+    S.tasks = S.tasks.filter(t => t.noteId !== S.activeNoteId || presentIds.has(t.id));
+    n.content   = edContentEl.innerHTML;
     n.title     = document.getElementById('ed-title').value.trim();
     n.updatedAt = nowMs();
-    save(); showSaved(); renderNotesList(); updateNoteBadges(); updateInboxBadge();
+    save(); showSaved(); renderNotesList(); renderTasks(); updateNoteBadges(); updateInboxBadge();
     updateCtxPrompt(n);
   }, 2000);
 }
@@ -157,15 +193,18 @@ function scheduleAutosave() {
 function forceSave() {
   clearTimeout(asTimer);
   const n = getNote(S.activeNoteId); if (!n) return;
-  n.content   = document.getElementById('ed-content').innerHTML;
+  const edContentEl = document.getElementById('ed-content');
+  const presentIds = new Set([...edContentEl.querySelectorAll('.task-item[data-task-id]')].map(el => el.dataset.taskId));
+  S.tasks = S.tasks.filter(t => t.noteId !== S.activeNoteId || presentIds.has(t.id));
+  n.content   = edContentEl.innerHTML;
   n.title     = document.getElementById('ed-title').value.trim();
-  n.updatedAt = nowMs(); save(); showSaved(); renderNotesList();
+  n.updatedAt = nowMs(); save(); showSaved(); renderNotesList(); renderTasks();
 }
 
 // ── Editor Commands ──────────────────────────────────────────
 
 function ec(cmd)   { document.getElementById('ed-content').focus(); document.execCommand(cmd, false, null); scheduleAutosave(); }
-function eh(lvl)   { document.getElementById('ed-content').focus(); document.execCommand('formatBlock', false, 'h' + lvl); scheduleAutosave(); }
+function eh(lvl)   { document.getElementById('ed-content').focus(); document.execCommand('formatBlock', false, lvl === 'p' ? 'p' : 'h' + lvl); scheduleAutosave(); }
 function eSize(size) {
   const ed = document.getElementById('ed-content'); ed.focus();
   document.execCommand('fontSize', false, '7');
@@ -240,6 +279,203 @@ function selectWikiLink(note) {
 
 function closeWikiAC() { document.getElementById('wiki-ac').classList.remove('open'); }
 
+// ── Contact @-Linking ────────────────────────────────────────
+
+function handleContactInput() {
+  const sel = window.getSelection(); if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const text  = (range.startContainer.textContent || '').slice(0, range.startOffset);
+  const atIdx = text.lastIndexOf('@');
+  if (atIdx !== -1) {
+    const query = text.slice(atIdx + 1);
+    if (!query.includes(' ') && !query.includes('@')) { showContactAC(query, range); return; }
+  }
+  closeContactAC();
+}
+
+function showContactAC(query, range) {
+  const ac = document.getElementById('contact-ac');
+  const q  = query.toLowerCase();
+  const matches = (S.contacts || []).filter(c =>
+    (c.name || '').toLowerCase().includes(q) ||
+    (c.organization || '').toLowerCase().includes(q)
+  ).slice(0, 8);
+  if (!matches.length) { closeContactAC(); return; }
+  ac.innerHTML = '';
+  matches.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'cac-item' + (i === 0 ? ' foc' : '');
+    div.innerHTML = `<span class="cn">@${esc(c.name || 'Unnamed')}</span>${c.organization ? `<span class="co">${esc(c.organization)}</span>` : ''}`;
+    div.onmousedown = e => e.preventDefault();
+    div.onclick = () => selectContactLink(c);
+    ac.appendChild(div);
+  });
+  const rect = range.getBoundingClientRect();
+  ac.style.top = (rect.bottom + 4) + 'px'; ac.style.left = rect.left + 'px';
+  ac.classList.add('open');
+}
+
+function selectContactLink(contact) {
+  closeContactAC();
+  const sel = window.getSelection(); if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const node  = range.startContainer;
+  const off   = range.startOffset;
+  const text  = node.textContent || '';
+  const atIdx = text.slice(0, off).lastIndexOf('@');
+  if (atIdx === -1) return;
+  const nr = document.createRange(); nr.setStart(node, atIdx); nr.setEnd(node, off); nr.deleteContents();
+  const a = document.createElement('a');
+  a.className = 'contact-link'; a.dataset.contactId = contact.id;
+  a.textContent = '@' + (contact.name || 'Unnamed');
+  a.onclick = e => { e.preventDefault(); showView('contacts'); };
+  nr.insertNode(a);
+  const ar = document.createRange(); ar.setStartAfter(a); ar.collapse(true);
+  sel.removeAllRanges(); sel.addRange(ar);
+  scheduleAutosave();
+}
+
+function closeContactAC() { document.getElementById('contact-ac').classList.remove('open'); }
+
+// ── Slash Commands ───────────────────────────────────────────
+
+function handleSlashInput() {
+  if (document.getElementById('wiki-ac').classList.contains('open')) return;
+  if (document.getElementById('contact-ac').classList.contains('open')) return;
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  if (range.startContainer.nodeType !== Node.TEXT_NODE) { closeSlashPicker(); return; }
+  const text     = range.startContainer.textContent.slice(0, range.startOffset);
+  const slashIdx = text.lastIndexOf('/');
+  if (slashIdx === -1) { closeSlashPicker(); return; }
+  if (text.slice(0, slashIdx).trim() !== '') { closeSlashPicker(); return; }
+  const query = text.slice(slashIdx + 1);
+  if (query.includes(' ')) { closeSlashPicker(); return; }
+  showSlashPicker(query, range, range.startContainer, slashIdx);
+}
+
+function showSlashPicker(query, range, textNode, slashIdx) {
+  const sp = document.getElementById('slash-picker');
+  const q  = query.toLowerCase();
+  const matches = SLASH_COMMANDS.filter(c =>
+    !q || c.label.toLowerCase().includes(q) || c.keywords.some(k => k.includes(q))
+  );
+  if (!matches.length) { closeSlashPicker(); return; }
+  sp._slashNode = textNode;
+  sp._slashOff  = slashIdx;
+  sp.innerHTML  = '';
+  matches.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'sp-item' + (i === 0 ? ' foc' : '');
+    div.innerHTML = `<span class="sp-item-icon">${c.icon}</span><span>${esc(c.label)}</span>`;
+    div.onmousedown = e => e.preventDefault();
+    div.onclick = () => executeSlashCommand(c.cmd);
+    sp.appendChild(div);
+  });
+  const rect = range.getBoundingClientRect();
+  sp.style.top  = (rect.bottom + 4) + 'px';
+  sp.style.left = rect.left + 'px';
+  sp.classList.add('open');
+}
+
+function closeSlashPicker() {
+  const sp = document.getElementById('slash-picker');
+  sp.classList.remove('open');
+  sp._slashNode = null; sp._slashOff = null;
+}
+
+function executeSlashCommand(cmd) {
+  const sp       = document.getElementById('slash-picker');
+  const textNode = sp._slashNode;
+  const slashOff = sp._slashOff;
+  closeSlashPicker();
+  edContent.focus();
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return;
+  // Delete the /query text from the text node
+  if (textNode && textNode.parentNode && slashOff !== null) {
+    const curOff = sel.getRangeAt(0).startOffset;
+    const endOff = Math.min(Math.max(slashOff, curOff), textNode.length);
+    const dr = document.createRange();
+    dr.setStart(textNode, slashOff); dr.setEnd(textNode, endOff);
+    dr.deleteContents();
+    const cr = document.createRange(); cr.setStart(textNode, slashOff); cr.collapse(true);
+    sel.removeAllRanges(); sel.addRange(cr);
+  }
+  const info  = getBlockLineText();
+  const block = info ? info.block : null;
+  if (cmd === 'task')  { insertInlineTask(block); return; }
+  if (cmd === 'table') { insertTable(); return; }
+  if (cmd === 'code')  { insertCode();  return; }
+  if (cmd === 'h1' || cmd === 'h2' || cmd === 'h3') {
+    if (block) {
+      const h = document.createElement(cmd);
+      h.innerHTML = block.innerHTML || '<br>'; h.removeAttribute('style');
+      block.replaceWith(h);
+      const cr = document.createRange(); cr.selectNodeContents(h); cr.collapse(false);
+      sel.removeAllRanges(); sel.addRange(cr);
+    } else { document.execCommand('formatBlock', false, cmd); }
+  } else if (cmd === 'ul' || cmd === 'ol') {
+    if (block) {
+      const list = document.createElement(cmd);
+      const li = document.createElement('li'); li.innerHTML = block.innerHTML || '<br>';
+      list.appendChild(li); block.replaceWith(list);
+      const cr = document.createRange(); cr.selectNodeContents(li); cr.collapse(false);
+      sel.removeAllRanges(); sel.addRange(cr);
+    } else { document.execCommand(cmd === 'ul' ? 'insertUnorderedList' : 'insertOrderedList', false, null); }
+  } else if (cmd === 'blockquote') {
+    document.execCommand('formatBlock', false, 'blockquote');
+  } else if (cmd === 'hr') {
+    const hr = document.createElement('hr');
+    const p  = document.createElement('p'); p.innerHTML = '<br>';
+    if (block) {
+      block.replaceWith(hr); hr.after(p);
+      const cr = document.createRange(); cr.selectNodeContents(p); cr.collapse(false);
+      sel.removeAllRanges(); sel.addRange(cr);
+    } else { document.execCommand('insertHTML', false, '<hr><p><br></p>'); }
+  } else if (cmd === 'callout') {
+    const div = document.createElement('div'); div.className = 'callout'; div.innerHTML = '<br>';
+    const p   = document.createElement('p');   p.innerHTML   = '<br>';
+    if (block) {
+      block.replaceWith(div); div.after(p);
+      const cr = document.createRange(); cr.selectNodeContents(div); cr.collapse(false);
+      sel.removeAllRanges(); sel.addRange(cr);
+    } else { document.execCommand('insertHTML', false, '<div class="callout"><br></div><p><br></p>'); }
+  }
+  scheduleAutosave();
+}
+
+// ── Inline Task Checkboxes ────────────────────────────────────
+
+function insertInlineTask(block) {
+  const taskId = uid();
+  const task = { id:taskId, title:'', due:null, recur:null, noteId:S.activeNoteId||null, createdAt:nowMs(), completedAt:null };
+  S.tasks.unshift(task);
+  const div  = document.createElement('div');  div.className = 'task-item'; div.dataset.taskId = taskId;
+  const chk  = document.createElement('span'); chk.className = 'ti-chk';
+  const body = document.createElement('span'); body.className = 'ti-body'; body.innerHTML = '<br>';
+  const due  = document.createElement('input'); due.type = 'date'; due.className = 'ti-due-inp';
+  div.appendChild(chk); div.appendChild(body); div.appendChild(due);
+  const sel = window.getSelection();
+  if (block) {
+    block.replaceWith(div);
+  } else if (sel && sel.rangeCount) {
+    sel.getRangeAt(0).insertNode(div);
+  }
+  const cr = document.createRange(); cr.selectNodeContents(body); cr.collapse(false);
+  sel.removeAllRanges(); sel.addRange(cr);
+  save(); renderTasks(); scheduleAutosave();
+}
+
+function toggleInlineTask(taskId) {
+  const task = S.tasks.find(t => t.id === taskId); if (!task) return;
+  task.completedAt = task.completedAt ? null : nowMs();
+  const el = document.getElementById('ed-content').querySelector(`.task-item[data-task-id="${taskId}"]`);
+  if (el) el.classList.toggle('ti-done', !!task.completedAt);
+  save(); renderTasks(); scheduleAutosave();
+}
+
 // ── Backlinks ────────────────────────────────────────────────
 
 function renderBacklinks(note) {
@@ -290,7 +526,32 @@ function createTaskFromSel() {
 const edContent = document.getElementById('ed-content');
 const edTitle   = document.getElementById('ed-title');
 
-edContent.addEventListener('input', () => { handleWikiInput(); handleMarkdownInline(); scheduleAutosave(); });
+edContent.addEventListener('input', () => { handleWikiInput(); handleContactInput(); handleSlashInput(); handleMarkdownInline(); scheduleAutosave(); });
+
+edContent.addEventListener('click', e => {
+  const chk = e.target.closest('.ti-chk');
+  if (chk) { const item = chk.closest('.task-item'); if (item && item.dataset.taskId) { e.preventDefault(); toggleInlineTask(item.dataset.taskId); } }
+});
+
+// Sync inline task title immediately on input (don't wait for autosave debounce)
+edContent.addEventListener('input', e => {
+  const tiBody = e.target.closest && e.target.closest('.ti-body');
+  if (!tiBody) return;
+  const item = tiBody.closest('.task-item');
+  if (!item) return;
+  const task = S.tasks.find(t => t.id === item.dataset.taskId);
+  if (task) { task.title = tiBody.textContent.trim(); renderTasks(); }
+});
+
+// Sync inline task due date on change
+edContent.addEventListener('change', e => {
+  const inp = e.target.closest && e.target.closest('.ti-due-inp');
+  if (!inp) return;
+  const item = inp.closest('.task-item');
+  if (!item) return;
+  const task = S.tasks.find(t => t.id === item.dataset.taskId);
+  if (task) { task.due = inp.value || null; save(); renderTasks(); }
+});
 
 // ── Toolbar State ─────────────────────────────────────────────
 
@@ -400,6 +661,7 @@ function handleMarkdownBlockShortcut() {
   else if (text === '#')   headingTag = 'h1';
   else if (text === '-' || text === '*') listCmd = 'insertUnorderedList';
   else if (text === '1.')  listCmd = 'insertOrderedList';
+  else if (text === '[ ]') { prefixRange.deleteContents(); insertInlineTask(block); return true; }
   else return false;
 
   if (headingTag) {
@@ -429,14 +691,30 @@ function handleMarkdownBlockShortcut() {
       window.getSelection().removeAllRanges(); window.getSelection().addRange(cr);
     }
   } else {
-    // List shortcuts — delete prefix then let execCommand wrap in list
+    // List shortcuts — don't fire inside heading elements
+    if (block && /^H[1-6]$/.test(block.tagName)) return false;
+    // Delete prefix then manually build list structure.
+    // Avoids execCommand('insertUnorderedList') which can absorb adjacent blocks.
     prefixRange.deleteContents();
-    const sel = window.getSelection();
-    const cr = document.createRange();
-    cr.setStart(prefixRange.startContainer, prefixRange.startOffset);
-    cr.collapse(true);
-    sel.removeAllRanges(); sel.addRange(cr);
-    document.execCommand(listCmd, false, null);
+    if (block) {
+      const tag  = listCmd === 'insertOrderedList' ? 'ol' : 'ul';
+      const list = document.createElement(tag);
+      const li   = document.createElement('li');
+      li.innerHTML = block.innerHTML || '<br>';
+      if (!li.innerHTML) li.innerHTML = '<br>';
+      list.appendChild(li);
+      block.replaceWith(list);
+      const cr = document.createRange(); cr.selectNodeContents(li); cr.collapse(false);
+      window.getSelection().removeAllRanges(); window.getSelection().addRange(cr);
+    } else {
+      // Rare: cursor not inside a block element — fall back to execCommand
+      const sel = window.getSelection();
+      const cr  = document.createRange();
+      cr.setStart(prefixRange.startContainer, prefixRange.startOffset);
+      cr.collapse(true);
+      sel.removeAllRanges(); sel.addRange(cr);
+      document.execCommand(listCmd, false, null);
+    }
   }
   scheduleAutosave(); return true;
 }
@@ -446,13 +724,19 @@ function handleMarkdownEnterShortcut() {
   const { block, text, prefixRange } = info;
 
   if (text === '---') {
-    prefixRange.deleteContents();
-    const sel = window.getSelection();
-    const cr = document.createRange();
-    cr.setStart(prefixRange.startContainer, prefixRange.startOffset);
-    cr.collapse(true);
-    sel.removeAllRanges(); sel.addRange(cr);
-    document.execCommand('insertHorizontalRule', false, null);
+    const hr = document.createElement('hr');
+    const p  = document.createElement('p'); p.innerHTML = '<br>';
+    if (block) {
+      block.replaceWith(hr);
+      hr.after(p);
+    } else {
+      prefixRange.deleteContents();
+      const cr = document.createRange();
+      cr.setStart(prefixRange.startContainer, prefixRange.startOffset);
+      cr.insertNode(p); cr.insertNode(hr);
+    }
+    const cr2 = document.createRange(); cr2.selectNodeContents(p); cr2.collapse(false);
+    window.getSelection().removeAllRanges(); window.getSelection().addRange(cr2);
     scheduleAutosave(); return true;
   }
 
@@ -510,17 +794,53 @@ edContent.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); const f = ac.querySelector('.wac-item.foc'); if (f) f.click(); return; }
     if (e.key === 'Escape') { closeWikiAC(); return; }
   }
-  if (e.key === 'Escape') { closeWikiAC(); return; }
+  const cac = document.getElementById('contact-ac');
+  if (cac.classList.contains('open')) {
+    const opts = cac.querySelectorAll('.cac-item'); const foc = cac.querySelector('.cac-item.foc'); const idx = [...opts].indexOf(foc);
+    if (e.key === 'ArrowDown') { e.preventDefault(); foc && foc.classList.remove('foc'); const n = opts[(idx + 1) % opts.length]; n && n.classList.add('foc'); return; }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); foc && foc.classList.remove('foc'); const p = opts[(idx - 1 + opts.length) % opts.length]; p && p.classList.add('foc'); return; }
+    if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); const f = cac.querySelector('.cac-item.foc'); if (f) f.click(); return; }
+    if (e.key === 'Escape') { closeContactAC(); return; }
+  }
+  const sp = document.getElementById('slash-picker');
+  if (sp.classList.contains('open')) {
+    const opts = sp.querySelectorAll('.sp-item'); const foc = sp.querySelector('.sp-item.foc'); const idx = [...opts].indexOf(foc);
+    if (e.key === 'ArrowDown') { e.preventDefault(); foc && foc.classList.remove('foc'); const n = opts[(idx + 1) % opts.length]; n && n.classList.add('foc'); return; }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); foc && foc.classList.remove('foc'); const p = opts[(idx - 1 + opts.length) % opts.length]; p && p.classList.add('foc'); return; }
+    if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); const f = sp.querySelector('.sp-item.foc'); if (f) f.click(); return; }
+    if (e.key === 'Escape') { closeSlashPicker(); return; }
+  }
+  if (e.key === 'Escape') { closeWikiAC(); closeContactAC(); closeSlashPicker(); return; }
   if (e.key === ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) { if (handleMarkdownBlockShortcut()) { e.preventDefault(); return; } }
-  if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey && !e.altKey) { if (handleMarkdownEnterShortcut()) { e.preventDefault(); return; } }
+  if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    // Inside a task-item: insert a new paragraph after it instead of cloning the div structure
+    const _sel = window.getSelection();
+    if (_sel && _sel.rangeCount) {
+      const _node = _sel.getRangeAt(0).startContainer;
+      const _el   = _node.nodeType === Node.TEXT_NODE ? _node.parentNode : _node;
+      const _item = _el.closest && _el.closest('.task-item');
+      if (_item) {
+        e.preventDefault();
+        const _p = document.createElement('p'); _p.innerHTML = '<br>';
+        _item.after(_p);
+        const _cr = document.createRange(); _cr.selectNodeContents(_p); _cr.collapse(false);
+        _sel.removeAllRanges(); _sel.addRange(_cr);
+        scheduleAutosave(); return;
+      }
+    }
+    if (handleMarkdownEnterShortcut()) { e.preventDefault(); return; }
+  }
   if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); forceSave(); toast('Saved'); }
   if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); ec('bold'); }
   if ((e.ctrlKey || e.metaKey) && e.key === 'i') { e.preventDefault(); ec('italic'); }
   if ((e.ctrlKey || e.metaKey) && e.key === 'u') { e.preventDefault(); ec('underline'); }
   if (e.key === 'Tab') {
     const s = window.getSelection();
-    if (s && s.anchorNode && s.anchorNode.closest && s.anchorNode.closest('li')) {
-      e.preventDefault(); e.shiftKey ? document.execCommand('outdent') : document.execCommand('indent');
+    if (s && s.anchorNode) {
+      const el = s.anchorNode.nodeType === Node.TEXT_NODE ? s.anchorNode.parentNode : s.anchorNode;
+      if (el && el.closest && el.closest('li')) {
+        e.preventDefault(); e.shiftKey ? document.execCommand('outdent') : document.execCommand('indent');
+      }
     }
   }
 });
@@ -533,6 +853,8 @@ edTitle.addEventListener('keydown', e => {
 
 document.addEventListener('click', e => {
   if (!document.getElementById('wiki-ac').contains(e.target) && e.target !== edContent) closeWikiAC();
+  if (!document.getElementById('contact-ac').contains(e.target) && e.target !== edContent) closeContactAC();
+  if (!document.getElementById('slash-picker').contains(e.target) && e.target !== edContent) closeSlashPicker();
 });
 
 // ── Heading Styles ───────────────────────────────────────────

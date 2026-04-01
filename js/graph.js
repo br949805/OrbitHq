@@ -9,6 +9,7 @@ const GRAPH_COLORS = {
   idea:       '#f0a040',
   plan:       '#a855f7',
   note:       '#aaaaaa',
+  contact:    '#22c55e',
 };
 const NODE_R = 18;
 const MAX_NODES = 80;
@@ -65,7 +66,7 @@ function buildGraph() {
     active: n.id === activeId,
   }));
 
-  // Edges: wiki links
+  // Edges: wiki links between notes
   const seen = new Set();
   gEdges = [];
   notes.forEach(n => {
@@ -74,6 +75,38 @@ function buildGraph() {
       if (!idSet.has(tid)) return;
       const key = [n.id, tid].sort().join('|');
       if (!seen.has(key)) { seen.add(key); gEdges.push({ s: n.id, t: tid }); }
+    });
+  });
+
+  // Contact nodes: collect from @mentions and meeting attendees
+  const contacts = S.contacts || [];
+  const mentionedContactIds = new Set();
+  notes.forEach(n => {
+    [...(n.content || '').matchAll(/data-contact-id="([^"]+)"/g)].forEach(m => mentionedContactIds.add(m[1]));
+    if (n.type === 'meeting' && n.metadata && n.metadata.attendeeIds) {
+      n.metadata.attendeeIds.forEach(cid => mentionedContactIds.add(cid));
+    }
+  });
+  mentionedContactIds.forEach(cid => {
+    const c = contacts.find(x => x.id === cid); if (!c) return;
+    gNodes.push({ id: cid, type: 'contact', title: c.name || 'Unnamed', x: 0, y: 0, vx: 0, vy: 0, active: false });
+  });
+
+  // Edges: notes → contacts (@mentions)
+  notes.forEach(n => {
+    [...(n.content || '').matchAll(/data-contact-id="([^"]+)"/g)].forEach(m => {
+      const cid = m[1]; if (!mentionedContactIds.has(cid)) return;
+      const key = [n.id, cid].sort().join('|');
+      if (!seen.has(key)) { seen.add(key); gEdges.push({ s: n.id, t: cid }); }
+    });
+  });
+  // Edges: meeting notes → attendees
+  notes.forEach(n => {
+    if (n.type !== 'meeting' || !n.metadata || !n.metadata.attendeeIds) return;
+    n.metadata.attendeeIds.forEach(cid => {
+      if (!mentionedContactIds.has(cid)) return;
+      const key = [n.id, cid].sort().join('|');
+      if (!seen.has(key)) { seen.add(key); gEdges.push({ s: n.id, t: cid }); }
     });
   });
 }
@@ -198,7 +231,7 @@ function drawGraph() {
     ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(NT[n.type]?.icon || '○', n.x, n.y);
+    ctx.fillText(n.type === 'contact' ? '@' : (NT[n.type]?.icon || '○'), n.x, n.y);
 
     // Label (always for active/hovered; only if small graph or close enough)
     const showLabel = n.active || isHov || gNodes.length <= 25;
@@ -232,8 +265,11 @@ function drawGraph() {
   ctx.textBaseline = 'bottom';
   ctx.font = '10px monospace';
   Object.entries(GRAPH_COLORS).reverse().forEach(([type, color]) => {
+    if (type === 'contact' && !gNodes.some(n => n.type === 'contact')) return;
+    const icon  = type === 'contact' ? '@' : (NT[type]?.icon  || '○');
+    const label = type === 'contact' ? 'Contact' : (NT[type]?.label || type);
     ctx.fillStyle = color;
-    ctx.fillText(NT[type]?.icon + ' ' + (NT[type]?.label || type), lx, ly);
+    ctx.fillText(icon + ' ' + label, lx, ly);
     ly -= 14;
   });
 
@@ -263,7 +299,9 @@ function attachGraphEvents() {
       const hint = document.getElementById('graph-hint');
       if (gHovered) {
         canvas.style.cursor = 'pointer';
-        hint.textContent = gHovered.title + (gHovered.active ? ' (current)' : ' — click to open');
+        hint.textContent = gHovered.type === 'contact'
+          ? gHovered.title + ' (contact) — click to view'
+          : gHovered.title + (gHovered.active ? ' (current)' : ' — click to open');
       } else {
         canvas.style.cursor = 'default';
         hint.textContent = 'Click a node to open · Drag to rearrange';
@@ -284,7 +322,8 @@ function attachGraphEvents() {
     const x = e.clientX - rect.left, y = e.clientY - rect.top;
     if (mousedownNode && mousedownPos && Math.hypot(x - mousedownPos.x, y - mousedownPos.y) < 6) {
       closeModal('graph-modal');
-      openNote(mousedownNode.id);
+      if (mousedownNode.type === 'contact') showContacts();
+      else openNote(mousedownNode.id);
     }
     gDragging = null; mousedownNode = null; mousedownPos = null;
   };

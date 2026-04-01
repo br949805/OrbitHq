@@ -189,7 +189,7 @@
         <div id="fu-panel">
           <div id="fu-header">
             <h3>↩ Follow Ups</h3>
-            <button class="add-fu-btn" onclick="openFuCapture()">+ Add</button>
+            <button class="add-task-btn" onclick="openFuCapture()">+ Add</button>
             <button class="fu-icon-btn" id="fu-exp-btn" onclick="toggleFuExpand()" title="Expand follow ups">⤢</button>
             <button class="fu-icon-btn" id="fu-col-btn" onclick="toggleFuCollapse()" title="Collapse follow ups">▼</button>
           </div>
@@ -303,6 +303,7 @@
               <button class="tbb" id="tbb-h1" onclick="eh(1)">H1</button>
               <button class="tbb" id="tbb-h2" onclick="eh(2)">H2</button>
               <button class="tbb" id="tbb-h3" onclick="eh(3)">H3</button>
+              <button class="tbb" id="tbb-normal" onclick="eh('p')" title="Normal text">¶</button>
               <div class="tbb-sep"></div>
               <button class="tbb" id="tbb-ul" onclick="ec('insertUnorderedList')">• List</button>
               <button class="tbb" id="tbb-ol" onclick="ec('insertOrderedList')">1. List</button>
@@ -655,6 +656,8 @@
 <div id="tag-picker"></div>
 <!-- WIKI AUTOCOMPLETE -->
 <div id="wiki-ac"></div>
+<div id="contact-ac"></div>
+<div id="slash-picker"></div>
 <!-- FLOAT TOOLBAR -->
 <div id="float-tb">
   <button class="ftb" onclick="ec('bold')"><strong>B</strong></button>

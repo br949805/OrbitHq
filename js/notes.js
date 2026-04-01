@@ -7,6 +7,7 @@ let noteSearch = '';
 function setNoteFilter(filter, el) {
   S.noteFilter = filter;
   document.querySelectorAll('.si[id^="sb-"]').forEach(e => e.classList.remove('active'));
+  document.querySelectorAll('.folder-row').forEach(e => e.classList.remove('active'));
   if (el) el.classList.add('active');
   else { const e = document.getElementById('sb-all'); if (e) e.classList.add('active'); }
   const labels = { 'all':'All Notes', 'pinned':'Pinned', 'type:scratchpad':'Scratchpad', 'type:meeting':'Meeting', 'type:snippet':'Snippet', 'type:idea':'Idea', 'type:plan':'Plan', 'type:note':'Note' };

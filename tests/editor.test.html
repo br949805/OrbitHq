@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OrbitHq — Editor Test Suite</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body   { font-family: 'Cascadia Code', 'Fira Code', monospace; background: #0f0f1a; color: #c9c9d6; padding: 28px 36px; line-height: 1.5; }
+  h1     { color: #a78bfa; font-size: 22px; margin-bottom: 6px; }
+  .meta  { color: #666; font-size: 12px; margin-bottom: 28px; }
+  .suite { margin: 22px 0 8px; }
+  .suite-title { color: #60a5fa; font-size: 13px; font-weight: bold; text-transform: uppercase;
+                 letter-spacing: .08em; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 6px; }
+  .test  { font-size: 13px; padding: 3px 10px; border-radius: 3px; margin: 2px 0; display: flex; gap: 10px; align-items: baseline; }
+  .pass  { background: rgba(52,211,153,.08); color: #6ee7b7; }
+  .fail  { background: rgba(248,113,113,.10); color: #f87171; }
+  .icon  { flex-shrink: 0; width: 14px; }
+  .detail{ color: #9ca3af; font-size: 11px; margin-top: 1px; }
+  #summary { margin-top: 28px; padding: 14px 18px; border-radius: 6px; font-size: 15px; font-weight: bold; }
+  #summary.all-pass { background: rgba(52,211,153,.15); color: #6ee7b7; border: 1px solid rgba(52,211,153,.3); }
+  #summary.has-fail { background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); }
+  /* Sandbox — off screen but still in layout so contenteditable works */
+  #sandbox { position: fixed; left: -9999px; top: 0; width: 600px; }
+</style>
+</head>
+<body>
+
+<h1>OrbitHq — Editor Test Suite</h1>
+<p class="meta">Tests for markdown shortcuts, list behaviour, inline formatting, and keyboard handling in the note editor.</p>
+<div id="results"></div>
+<div id="summary"></div>
+
+<!-- ── Minimal DOM required by editor.js ──────────────────────── -->
+<div id="sandbox">
+  <div id="ed-content" contenteditable="true"></div>
+  <input id="ed-title" type="text">
+  <div id="wiki-ac"></div>
+  <div id="float-tb"></div>
+  <div id="toast"></div>
+  <div id="asdot"></div>
+  <div id="aslbl"></div>
+  <div id="ctx-prompt"></div>
+  <div id="ed-empty"></div>
+  <div id="ed-wrap"></div>
+  <div id="ed-back"></div>
+  <div id="pin-btn"></div>
+  <div id="folder-btn"></div>
+  <div id="backlinks" style="display:none"></div>
+  <div id="bl-body"></div>
+  <div id="bl-ct"></div>
+  <div id="bl-tog"></div>
+  <div id="meta-block"></div>
+  <div id="dyn-heading-styles"></div>
+  <div id="confirm-modal"><div id="confirm-modal-title"></div><div id="confirm-modal-msg"></div></div>
+  <div id="tbb-bold"></div><div id="tbb-italic"></div><div id="tbb-underline"></div>
+  <div id="tbb-h1"></div><div id="tbb-h2"></div><div id="tbb-h3"></div>
+  <div id="tbb-ul"></div><div id="tbb-ol"></div>
+  <div id="contact-ac"></div>
+  <div id="slash-picker"></div>
+  <div id="color-dot"></div>
+</div>
+
+<!-- ── Mock globals ────────────────────────────────────────────── -->
+<script>
+  let S = {
+    notes: [], folders: [], settings: {}, tags: [],
+    activeNoteId: null, navHistory: [], blOpen: false,
+    dismissedCtx: [], noteFilter: 'all', tasks: []
+  };
+  let NT = {
+    note:       { label:'Note',       icon:'○', cls:'type-note',       template:'' },
+    scratchpad: { label:'Scratchpad', icon:'◈', cls:'type-scratchpad', template:'' },
+    meeting:    { label:'Meeting',    icon:'◉', cls:'type-meeting',    template:'' },
+  };
+  let currentView = 'dashboard';
+
+  // Stubs — tests don't need these to do real work
+  function save()              {}
+  function renderNotesList()   {}
+  function updateNoteBadges()  {}
+  function updateInboxBadge()  {}
+  function renderTasks()       {}
+  function renderBacklinks()   {}
+  function renderNoteTags()    {}
+  function renderMetadata()    {}
+  function updateCtxPrompt()   {}
+  function isAged()            { return false; }
+  function isUnprocessed()     { return false; }
+  function showView()          {}
+  function openNote()          {}
+  function buildAttendeeField(){ return document.createElement('div'); }
+  function getNote(id)         { return S.notes.find(n => n.id === id) || null; }
+</script>
+
+<script src="../js/utils.js"></script>
+<script src="../js/editor.js"></script>
+
+<!-- ── Test framework + tests ─────────────────────────────────── -->
+<script>
+'use strict';
+
+// ── Mini test runner ─────────────────────────────────────────────
+let _pass = 0, _fail = 0;
+const _resultsEl = document.getElementById('results');
+let _suiteEl = null;
+
+function suite(name) {
+  const wrap = document.createElement('div');
+  wrap.className = 'suite';
+  wrap.innerHTML = `<div class="suite-title">${name}</div>`;
+  _resultsEl.appendChild(wrap);
+  _suiteEl = wrap;
+}
+
+function test(name, fn) {
+  const row = document.createElement('div');
+  row.className = 'test';
+  try {
+    fn();
+    row.classList.add('pass');
+    row.innerHTML = `<span class="icon">✓</span><span>${name}</span>`;
+    _pass++;
+  } catch(err) {
+    row.classList.add('fail');
+    row.innerHTML = `<span class="icon">✗</span><span>${name}<div class="detail">${err.message}</div></span>`;
+    _fail++;
+    console.error(`FAIL: ${name}`, err);
+  }
+  _suiteEl.appendChild(row);
+}
+
+function assert(cond, msg) {
+  if (!cond) throw new Error(msg || 'Assertion failed');
+}
+function assertHTML(actual, substr, msg) {
+  if (!actual.toLowerCase().includes(substr.toLowerCase()))
+    throw new Error(msg || `Expected "${substr}" in HTML:\n${actual}`);
+}
+function assertNoHTML(actual, substr, msg) {
+  if (actual.toLowerCase().includes(substr.toLowerCase()))
+    throw new Error(msg || `Did NOT expect "${substr}" in HTML:\n${actual}`);
+}
+
+// ── DOM helpers ──────────────────────────────────────────────────
+const ed = document.getElementById('ed-content');
+
+function setHTML(html) {
+  ed.innerHTML = html;
+}
+
+/** Position cursor at a specific offset within a container node. */
+function cursorAt(container, offset) {
+  const r = document.createRange();
+  r.setStart(container, offset);
+  r.collapse(true);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(r);
+}
+
+/** Position cursor at the end of the last text node inside `el`. */
+function cursorAtEnd(el) {
+  function lastText(node) {
+    if (node.nodeType === Node.TEXT_NODE) return node;
+    for (let i = node.childNodes.length - 1; i >= 0; i--) {
+      const t = lastText(node.childNodes[i]);
+      if (t) return t;
+    }
+    return null;
+  }
+  const tn = lastText(el);
+  const r  = document.createRange();
+  if (tn) { r.setStart(tn, tn.length); r.collapse(true); }
+  else    { r.selectNodeContents(el); r.collapse(false); }
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(r);
+}
+
+function pressSpace() {
+  ed.dispatchEvent(new KeyboardEvent('keydown', { key:' ', bubbles:true, cancelable:true }));
+}
+function pressEnter() {
+  ed.dispatchEvent(new KeyboardEvent('keydown', { key:'Enter', bubbles:true, cancelable:true }));
+}
+function pressTab(shift = false) {
+  ed.dispatchEvent(new KeyboardEvent('keydown', { key:'Tab', shiftKey:shift, bubbles:true, cancelable:true }));
+}
+function pressCtrl(key) {
+  ed.dispatchEvent(new KeyboardEvent('keydown', { key, ctrlKey:true, bubbles:true, cancelable:true }));
+}
+function fireInput() {
+  ed.dispatchEvent(new Event('input', { bubbles:true }));
+}
+
+// ════════════════════════════════════════════════════════════════
+//  SUITE 1 — getBlockLineText()
+// ════════════════════════════════════════════════════════════════
+suite('getBlockLineText()');
+
+test('returns full text of a <p> when cursor is at end', () => {
+  setHTML('<p>hello</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  const info = getBlockLineText();
+  assert(info !== null, 'should return info object');
+  assert(info.text === 'hello', `expected "hello", got "${info.text}"`);
+  assert(info.block === ed.querySelector('p'), 'block should be the <p> element');
+});
+
+test('returns partial text when cursor is mid-line', () => {
+  setHTML('<p>abcdef</p>');
+  const tn = ed.querySelector('p').firstChild;
+  cursorAt(tn, 3);
+  const info = getBlockLineText();
+  assert(info !== null);
+  assert(info.text === 'abc', `expected "abc", got "${info.text}"`);
+});
+
+test('returns null for a non-collapsed (text-selected) range', () => {
+  setHTML('<p>hello</p>');
+  const r = document.createRange();
+  r.selectNodeContents(ed.querySelector('p'));
+  const sel = window.getSelection();
+  sel.removeAllRanges(); sel.addRange(r);
+  assert(getBlockLineText() === null, 'must return null for selection');
+});
+
+test('returns null when cursor is outside ed-content', () => {
+  const dummy = document.createElement('p');
+  dummy.textContent = 'outside';
+  document.body.appendChild(dummy);
+  cursorAt(dummy.firstChild, 2);
+  assert(getBlockLineText() === null, 'must return null when cursor is outside editor');
+  document.body.removeChild(dummy);
+});
+
+test('handles cursor inside nested inline element (<strong>)', () => {
+  setHTML('<p><strong>bold text</strong></p>');
+  const strong = ed.querySelector('strong');
+  cursorAtEnd(strong);
+  const info = getBlockLineText();
+  assert(info !== null);
+  assert(info.text === 'bold text', `expected "bold text", got "${info.text}"`);
+});
+
+// ════════════════════════════════════════════════════════════════
+//  SUITE 2 — "- " unordered list shortcut
+// ════════════════════════════════════════════════════════════════
+suite('Markdown: "- " → unordered list');
+
+test('single "-" in a <p> becomes <ul><li>', () => {
+  setHTML('<p>-</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertHTML(ed.innerHTML, '<ul>', 'should produce <ul>');
+  assertHTML(ed.innerHTML, '<li>', 'should produce <li>');
+  assertNoHTML(ed.innerHTML, '<p>-</p>', 'raw "-" paragraph should be gone');
+});
+
+test('cursor lands inside the new <li>', () => {
+  setHTML('<p>-</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  const sel = window.getSelection();
+  let node = sel.anchorNode;
+  if (node && node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+  let inLI = false;
+  while (node && node !== ed) {
+    if (node.tagName === 'LI') { inLI = true; break; }
+    node = node.parentNode;
+  }
+  assert(inLI, 'cursor must be inside an <li> after list creation');
+});
+
+test('previous paragraph is NOT absorbed into the list', () => {
+  setHTML('<p>Previous content</p><p>-</p>');
+  cursorAtEnd(ed.querySelectorAll('p')[1]);
+  pressSpace();
+  assertHTML(ed.innerHTML, 'Previous content', 'previous paragraph must be preserved');
+  const ul = ed.querySelector('ul');
+  assert(ul !== null, 'list should exist');
+  assert(!ul.textContent.includes('Previous content'),
+    'list must not contain the previous paragraph text');
+});
+
+test('does NOT trigger when "-" is not the only text in the block', () => {
+  setHTML('<p>some text -</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertNoHTML(ed.innerHTML, '<ul>', 'no list should be created');
+});
+
+test('multiple prior paragraphs are all preserved', () => {
+  setHTML('<p>Line A</p><p>Line B</p><p>Line C</p><p>-</p>');
+  const paras = ed.querySelectorAll('p');
+  cursorAtEnd(paras[3]);
+  pressSpace();
+  assertHTML(ed.innerHTML, 'Line A');
+  assertHTML(ed.innerHTML, 'Line B');
+  assertHTML(ed.innerHTML, 'Line C');
+  assert(ed.querySelectorAll('ul').length === 1, 'exactly one list should exist');
+});
+
+test('block with text after cursor converts correctly (text stays in <li>)', () => {
+  // Cursor right after "-" with "more" still in the block
+  setHTML('<p>-more</p>');
+  const tn = ed.querySelector('p').firstChild; // text node "-more"
+  cursorAt(tn, 1); // cursor after the "-"
+  handleMarkdownBlockShortcut();
+  const li = ed.querySelector('li');
+  assert(li !== null, '<li> must be created');
+  assert(li.textContent.includes('more'), 'text after prefix must be in the <li>');
+});
+
+// ════════════════════════════════════════════════════════════════
+//  SUITE 3 — "* " unordered list shortcut
+// ════════════════════════════════════════════════════════════════
+suite('Markdown: "* " → unordered list');
+
+test('single "*" in a <p> becomes <ul><li>', () => {
+  setHTML('<p>*</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertHTML(ed.innerHTML, '<ul>');
+  assertHTML(ed.innerHTML, '<li>');
+});
+
+test('previous paragraph is NOT absorbed', () => {
+  setHTML('<p>Prior text</p><p>*</p>');
+  cursorAtEnd(ed.querySelectorAll('p')[1]);
+  pressSpace();
+  assertHTML(ed.innerHTML, 'Prior text');
+  const ul = ed.querySelector('ul');
+  assert(ul && !ul.textContent.includes('Prior text'), 'prior text must not be in the list');
+});
+
+test('does NOT trigger when "*" is mid-line', () => {
+  setHTML('<p>note *</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertNoHTML(ed.innerHTML, '<ul>');
+});
+
+// ════════════════════════════════════════════════════════════════
+//  SUITE 4 — "1. " ordered list shortcut
+// ════════════════════════════════════════════════════════════════
+suite('Markdown: "1. " → ordered list');
+
+test('single "1." in a <p> becomes <ol><li>', () => {
+  setHTML('<p>1.</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertHTML(ed.innerHTML, '<ol>');
+  assertHTML(ed.innerHTML, '<li>');
+  assertNoHTML(ed.innerHTML, '<ul>');
+});
+
+test('cursor lands inside <li>', () => {
+  setHTML('<p>1.</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  const sel = window.getSelection();
+  let node = sel.anchorNode;
+  if (node && node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+  let inLI = false;
+  while (node && node !== ed) {
+    if (node.tagName === 'LI') { inLI = true; break; }
+    node = node.parentNode;
+  }
+  assert(inLI, 'cursor must be inside <li>');
+});
+
+test('previous paragraph is NOT absorbed', () => {
+  setHTML('<p>Previous line</p><p>1.</p>');
+  cursorAtEnd(ed.querySelectorAll('p')[1]);
+  pressSpace();
+  assertHTML(ed.innerHTML, 'Previous line');
+  const ol = ed.querySelector('ol');
+  assert(ol && !ol.textContent.includes('Previous line'), 'list must not absorb previous line');
+});
+
+test('"2." does NOT trigger ordered list (only "1." is supported)', () => {
+  setHTML('<p>2.</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertNoHTML(ed.innerHTML, '<ol>');
+});
+
+// ════════════════════════════════════════════════════════════════
+//  SUITE 5 — Heading shortcuts
+// ════════════════════════════════════════════════════════════════
+suite('Markdown: heading shortcuts');
+
+test('"# " converts <p> to <h1>', () => {
+  setHTML('<p>#</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertHTML(ed.innerHTML, '<h1>');
+  assertNoHTML(ed.innerHTML, '<p>#</p>');
+});
+
+test('"## " converts <p> to <h2>', () => {
+  setHTML('<p>##</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertHTML(ed.innerHTML, '<h2>');
+});
+
+test('"### " converts <p> to <h3>', () => {
+  setHTML('<p>###</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertHTML(ed.innerHTML, '<h3>');
+});
+
+test('"#### " does NOT create <h4> (max depth is h3)', () => {
+  setHTML('<p>####</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertNoHTML(ed.innerHTML, '<h4>');
+});
+
+test('cursor lands inside the new heading', () => {
+  setHTML('<p>#</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  const h1 = ed.querySelector('h1');
+  assert(h1 !== null, '<h1> must exist');
+  const sel = window.getSelection();
+  let node = sel.anchorNode;
+  if (node && node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+  let inH1 = false;
+  while (node && node !== ed) {
+    if (node.tagName === 'H1') { inH1 = true; break; }
+    node = node.parentNode;
+  }
+  assert(inH1, 'cursor must be inside <h1>');
+});
+
+test('adjacent paragraphs are NOT affected by heading conversion', () => {
+  setHTML('<p>Before</p><p>#</p><p>After</p>');
+  const paras = ed.querySelectorAll('p');
+  cursorAtEnd(paras[1]);
+  pressSpace();
+  assertHTML(ed.innerHTML, 'Before');
+  assertHTML(ed.innerHTML, 'After');
+  const h1 = ed.querySelector('h1');
+  assert(!h1.textContent.includes('Before') && !h1.textContent.includes('After'),
+    'h1 must not contain adjacent paragraphs');
+});
+
+test('"#" mid-line does NOT trigger heading', () => {
+  setHTML('<p>text#</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assertNoHTML(ed.innerHTML, '<h1>');
+  assertNoHTML(ed.innerHTML, '<h2>');
+  assertNoHTML(ed.innerHTML, '<h3>');
+});
+
+test('heading text after prefix is preserved in the heading element', () => {
+  setHTML('<p>#My Title</p>');
+  const tn = ed.querySelector('p').firstChild;
+  cursorAt(tn, 1); // cursor right after "#"
+  handleMarkdownBlockShortcut();
+  const h1 = ed.querySelector('h1');
+  assert(h1 !== null, 'h1 should exist');
+  assert(h1.textContent.includes('My Title'), 'title text must be preserved');
+  assertNoHTML(h1.innerHTML, '#', 'the # prefix must be removed');
+});
+
+// ════════════════════════════════════════════════════════════════
+//  SUITE 6 — Enter shortcuts
+// ════════════════════════════════════════════════════════════════
+suite('Markdown: Enter shortcuts');
+
+test('"---" + Enter inserts a horizontal rule', () => {
+  setHTML('<p>---</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressEnter();
+  assert(ed.querySelector('hr') !== null, 'should produce an <hr>');
+});
+
+test('"--" + Enter does NOT insert a horizontal rule', () => {
+  setHTML('<p>--</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressEnter();
+  assert(ed.querySelector('hr') === null, 'should NOT create <hr> for "--"');
+});
+
+test('"----" + Enter does NOT insert a horizontal rule', () => {
+  setHTML('<p>----</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressEnter();
+  assert(ed.querySelector('hr') === null, 'should NOT create <hr> for "----"');
+});
+
+test('"```" + Enter creates <pre><code> block', () => {
+  setHTML('<p>```</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressEnter();
+  assertHTML(ed.innerHTML, '<pre>');
+  assertHTML(ed.innerHTML, '<code>');
+});
+
+test('"```" + Enter places cursor inside <code>', () => {
+  setHTML('<p>```</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressEnter();
+  const code = ed.querySelector('code');
+  assert(code !== null, '<code> must exist');
+  const sel = window.getSelection();
+  let node = sel.anchorNode;
+  // cursor may be in the text node inside <code> or in <code> itself
+  const inCode = code.contains(sel.anchorNode);
+  assert(inCode, 'cursor must be inside <code>');
+});
+
+test('"```" + Enter creates a following empty <p> for continued typing', () => {
+  setHTML('<p>```</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressEnter();
+  assert(ed.querySelector('p') !== null, 'a <p> should follow the code block for continued typing');
+});
+
+// ════════════════════════════════════════════════════════════════
+//  SUITE 7 — Inline markdown
+// ════════════════════════════════════════════════════════════════
+suite('Inline markdown');
+
+test('**word** → <strong>word</strong>', () => {
+  setHTML('<p></p>');
+  const tn = document.createTextNode('**hello**');
+  ed.querySelector('p').appendChild(tn);
+  cursorAt(tn, tn.length);
+  handleMarkdownInline();
+  assertHTML(ed.innerHTML, '<strong>');
+  assertHTML(ed.innerHTML, 'hello');
+  assertNoHTML(ed.innerHTML, '**hello**');
+});
+
+test('`code` → <code>code</code>', () => {
+  setHTML('<p></p>');
+  const tn = document.createTextNode('`snippet`');
+  ed.querySelector('p').appendChild(tn);
+  cursorAt(tn, tn.length);
+  handleMarkdownInline();
+  assertHTML(ed.innerHTML, '<code>');
+  assertHTML(ed.innerHTML, 'snippet');
+  assertNoHTML(ed.innerHTML, '`snippet`');
+});
+
+test('incomplete **text does NOT trigger bold', () => {
+  setHTML('<p></p>');
+  const tn = document.createTextNode('**hello');
+  ed.querySelector('p').appendChild(tn);
+  cursorAt(tn, tn.length);
+  handleMarkdownInline();
+  assertNoHTML(ed.innerHTML, '<strong>');
+});
+
+test('incomplete `code does NOT trigger inline code', () => {
+  setHTML('<p></p>');
+  const tn = document.createTextNode('`hello');
+  ed.querySelector('p').appendChild(tn);
+  cursorAt(tn, tn.length);
+  handleMarkdownInline();
+  assertNoHTML(ed.innerHTML, '<code>');
+});
+
+test('**bold** with surrounding text — only the matched span becomes <strong>', () => {
+  setHTML('<p></p>');
+  const tn = document.createTextNode('intro **word** end');
+  ed.querySelector('p').appendChild(tn);
+  // Cursor must be right after the closing "**", not at end of string
+  cursorAt(tn, 'intro **word**'.length);
+  handleMarkdownInline();
+  const strong = ed.querySelector('strong');
+  assert(strong !== null, '<strong> must exist');
+  assert(strong.textContent === 'word', `inner text should be "word", got "${strong.textContent}"`);
+  assertHTML(ed.innerHTML, 'intro');
+  assertHTML(ed.innerHTML, 'end');
+});
+
+test('`code` with surrounding text — only matched span becomes <code>', () => {
+  setHTML('<p></p>');
+  const tn = document.createTextNode('see `fn()` here');
+  ed.querySelector('p').appendChild(tn);
+  // Cursor must be right after the closing backtick, not at end of string
+  cursorAt(tn, 'see `fn()`'.length);
+  handleMarkdownInline();
+  const code = ed.querySelector('code');
+  assert(code !== null, '<code> must exist');
+  assert(code.textContent === 'fn()', `inner text should be "fn()", got "${code.textContent}"`);
+});
+
+test('cursor is placed after the newly created inline element', () => {
+  setHTML('<p></p>');
+  const tn = document.createTextNode('**word**');
+  ed.querySelector('p').appendChild(tn);
+  cursorAt(tn, tn.length);
+  handleMarkdownInline();
+  const sel = window.getSelection();
+  const strong = ed.querySelector('strong');
+  assert(strong !== null);
+  // The cursor should be after the <strong> element
+  const r = sel.getRangeAt(0);
+  assert(r.collapsed, 'selection should be collapsed');
+  // startContainer should be after strong — either a text node or the parent <p>
+  const afterStrong = strong.nextSibling;
+  const inParent = r.startContainer === strong.parentNode;
+  const afterEl  = afterStrong && r.startContainer === afterStrong;
+  assert(inParent || afterEl, 'cursor must be positioned after the <strong> element');
+});
+
+// ════════════════════════════════════════════════════════════════
+//  SUITE 8 — Tab / Shift+Tab in lists
+// ════════════════════════════════════════════════════════════════
+suite('Tab / Shift+Tab in list items');
+
+test('Tab inside <li> text node does not crash and triggers indent', () => {
+  setHTML('<ul><li>item text</li></ul>');
+  const li = ed.querySelector('li');
+  cursorAtEnd(li); // cursor in the text node
+  // Verify cursor is in a text node
+  const sel = window.getSelection();
+  assert(sel.anchorNode.nodeType === Node.TEXT_NODE, 'sanity: cursor should be in text node');
+  // Tab should NOT throw
+  let threw = false;
+  try { pressTab(false); } catch(e) { threw = true; }
+  assert(!threw, 'Tab should not throw');
+});
+
+test('Shift+Tab inside <li> text node does not crash', () => {
+  setHTML('<ul><li>outer<ul><li>inner</li></ul></li></ul>');
+  const innerLI = ed.querySelector('ul ul li');
+  cursorAtEnd(innerLI);
+  let threw = false;
+  try { pressTab(true); } catch(e) { threw = true; }
+  assert(!threw, 'Shift+Tab should not throw');
+});
+
+test('Tab outside a list does NOT indent (no preventDefault side-effect crash)', () => {
+  setHTML('<p>plain text</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  let threw = false;
+  try { pressTab(false); } catch(e) { threw = true; }
+  assert(!threw, 'Tab outside list should not throw');
+  // editor should still be intact
+  assertHTML(ed.innerHTML, 'plain text');
+});
+
+// ════════════════════════════════════════════════════════════════
+//  SUITE 9 — Keyboard shortcuts (Ctrl+B/I/U/S)
+// ════════════════════════════════════════════════════════════════
+suite('Keyboard shortcuts (Ctrl+B/I/U/S)');
+
+test('Ctrl+S calls forceSave without crashing', () => {
+  const note = { id:'t1', title:'', content:'', updatedAt:Date.now(), type:'note', metadata:{}, folderId:null, pinned:false };
+  S.notes = [note]; S.activeNoteId = 't1';
+  setHTML('<p>content</p>');
+  let threw = false;
+  try { pressCtrl('s'); } catch(e) { threw = true; }
+  assert(!threw, 'Ctrl+S should not throw');
+  S.notes = []; S.activeNoteId = null;
+});
+
+test('Ctrl+B applies bold formatting (execCommand bold)', () => {
+  setHTML('<p>text</p>');
+  const tn = ed.querySelector('p').firstChild;
+  // Select the text
+  const r = document.createRange();
+  r.setStart(tn, 0); r.setEnd(tn, 4);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  let threw = false;
+  try { pressCtrl('b'); } catch(e) { threw = true; }
+  assert(!threw, 'Ctrl+B should not throw');
+});
+
+test('Ctrl+I applies italic formatting', () => {
+  setHTML('<p>text</p>');
+  const tn = ed.querySelector('p').firstChild;
+  const r = document.createRange();
+  r.setStart(tn, 0); r.setEnd(tn, 4);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  let threw = false;
+  try { pressCtrl('i'); } catch(e) { threw = true; }
+  assert(!threw, 'Ctrl+I should not throw');
+});
+
+// ════════════════════════════════════════════════════════════════
+//  SUITE 10 — Edge cases & regression guards
+// ════════════════════════════════════════════════════════════════
+suite('Edge cases & regressions');
+
+test('Pressing space on empty editor does not crash', () => {
+  setHTML('');
+  const r = document.createRange();
+  r.setStart(ed, 0); r.collapse(true);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  let threw = false;
+  try { pressSpace(); } catch(e) { threw = true; }
+  assert(!threw);
+});
+
+test('Block shortcut: only one <ul> is created (no duplicate lists)', () => {
+  setHTML('<p>-</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assert(ed.querySelectorAll('ul').length === 1, 'exactly one <ul> should be created');
+});
+
+test('"- " shortcut: list item is empty when "-" was the entire block content', () => {
+  setHTML('<p>-</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  const li = ed.querySelector('li');
+  assert(li !== null);
+  const text = li.textContent.trim();
+  assert(text === '', `list item should be empty, got "${text}"`);
+});
+
+test('"1. " shortcut: only one <ol> created', () => {
+  setHTML('<p>1.</p>');
+  cursorAtEnd(ed.querySelector('p'));
+  pressSpace();
+  assert(ed.querySelectorAll('ol').length === 1, 'exactly one <ol>');
+});
+
+test('getBlockLineText handles cursor in <li> correctly', () => {
+  setHTML('<ul><li>item</li></ul>');
+  cursorAtEnd(ed.querySelector('li'));
+  const info = getBlockLineText();
+  assert(info !== null, 'should return info for cursor in <li>');
+  assert(info.text === 'item', `expected "item", got "${info.text}"`);
+  assert(info.block !== null, 'block should be the <li>');
+});
+
+test('Block shortcut does not fire when cursor is in a heading', () => {
+  // Typing "- " inside an existing heading should NOT create a nested list
+  setHTML('<h2>-</h2>');
+  cursorAtEnd(ed.querySelector('h2'));
+  pressSpace();
+  assertNoHTML(ed.innerHTML, '<ul>', 'should not create a list inside a heading');
+});
+
+test('handleMarkdownInline does nothing when cursor is not in a text node', () => {
+  setHTML('<p><br></p>');
+  const p = ed.querySelector('p');
+  cursorAt(p, 0);
+  let threw = false;
+  try { handleMarkdownInline(); } catch(e) { threw = true; }
+  assert(!threw, 'handleMarkdownInline should not crash on element cursor');
+});
+
+// ════════════════════════════════════════════════════════════════
+//  Summary
+// ════════════════════════════════════════════════════════════════
+const sumEl = document.getElementById('summary');
+const total = _pass + _fail;
+sumEl.textContent = _fail === 0
+  ? `All ${total} tests passed ✓`
+  : `${_pass} / ${total} passed — ${_fail} FAILED`;
+sumEl.className = _fail > 0 ? 'has-fail' : 'all-pass';
+</script>
+</body>
+</html>

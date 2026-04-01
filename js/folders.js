@@ -48,11 +48,24 @@ function deleteFolder(id, e) {
   save(); renderFolderTree(); renderNotesList(); updateInboxBadge(); toast('Folder deleted');
 }
 
+function populateFolderSelect(sel, selectedId) {
+  S.folders.filter(f => !f.parentId).forEach(f => {
+    const o = document.createElement('option'); o.value = f.id; o.textContent = f.name;
+    if (f.id === selectedId) o.selected = true;
+    sel.appendChild(o);
+    S.folders.filter(c => c.parentId === f.id).forEach(c => {
+      const co = document.createElement('option'); co.value = c.id; co.textContent = '  ↳ ' + c.name;
+      if (c.id === selectedId) co.selected = true;
+      sel.appendChild(co);
+    });
+  });
+}
+
 function openAssignFolder() {
   const sel  = document.getElementById('assign-folder-sel');
   const note = getNote(S.activeNoteId);
   sel.innerHTML = '<option value="">— Unfiled —</option>';
-  S.folders.forEach(f => { const o = document.createElement('option'); o.value = f.id; o.textContent = (f.parentId ? '  ↳ ' : '') + f.name; if (note && note.folderId === f.id) o.selected = true; sel.appendChild(o); });
+  populateFolderSelect(sel, note && note.folderId);
   document.getElementById('assign-folder-modal').classList.add('open');
 }
 
