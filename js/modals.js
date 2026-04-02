@@ -65,7 +65,7 @@ function submitCapture() {
 // ── Settings ─────────────────────────────────────────────────
 
 function applyTheme(theme) {
-  const valid = ['clean', 'clean-dark', 'vibrant', 'carbon'];
+  const valid = ['clean', 'clean-dark', 'vibrant', 'carbon', 'aurora'];
   document.body.dataset.theme = valid.includes(theme) ? theme : '';
 }
 

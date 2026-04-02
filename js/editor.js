@@ -469,10 +469,26 @@ function insertInlineTask(block) {
 }
 
 function toggleInlineTask(taskId) {
-  const task = S.tasks.find(t => t.id === taskId); if (!task) return;
-  task.completedAt = task.completedAt ? null : nowMs();
   const el = document.getElementById('ed-content').querySelector(`.task-item[data-task-id="${taskId}"]`);
-  if (el) el.classList.toggle('ti-done', !!task.completedAt);
+  // Check both active tasks and archived
+  let task = S.tasks.find(t => t.id === taskId);
+  const wasArchived = !task;
+  if (wasArchived) task = (S.archived || []).find(t => t.id === taskId);
+  if (!task) return;
+
+  if (wasArchived) {
+    // Uncomplete: restore from archive to tasks
+    delete task.completedAt;
+    S.archived = S.archived.filter(t => t.id !== taskId);
+    S.tasks.unshift(task);
+    if (el) el.classList.remove('ti-done');
+  } else {
+    // Complete: archive it
+    task.completedAt = nowMs();
+    if (el) el.classList.add('ti-done');
+    S.archived = [...(S.archived || []), task];
+    S.tasks = S.tasks.filter(t => t.id !== taskId);
+  }
   save(); renderTasks(); scheduleAutosave();
 }
 
