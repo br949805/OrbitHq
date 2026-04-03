@@ -64,9 +64,19 @@ function submitCapture() {
 
 // ── Settings ─────────────────────────────────────────────────
 
+const THEME_BG = {
+  'clean':      '#f8f7fc',
+  'clean-dark': '#0d1117',
+  'vibrant':    '#faf9ff',
+  'carbon':     '#0e1012',
+  'aurora':     '#1f1368',
+};
+
 function applyTheme(theme) {
   const valid = ['clean', 'clean-dark', 'vibrant', 'carbon', 'aurora'];
   document.body.dataset.theme = valid.includes(theme) ? theme : '';
+  const color = THEME_BG[theme] || '#0f0f0f';
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', color);
 }
 
 function applyFontSize(size) {
