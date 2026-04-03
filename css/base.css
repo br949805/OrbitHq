@@ -37,33 +37,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:15
 /* ── Mobile layout overrides ─────────────────────────────────── */
 @media(max-width:768px){
   #main{flex-direction:column}
-  #panels{flex:1;overflow:hidden;display:flex;flex-direction:row}
 
-  /* The two top-level columns inside #panels */
-  #task-panel,#notes-side{
+  /* #panels is the positioning context for all mobile screens */
+  #panels{flex:1;overflow:hidden;position:relative}
+
+  /* Every screen is a full-size absolute layer — only one visible at a time */
+  #task-panel,#notes-side,#inbox-view{
     position:absolute;inset:0;
-    display:none;flex-direction:column;
-    width:100%!important;min-width:0!important;max-width:100%!important;
-    height:100%;overflow:hidden
+    display:none;flex-direction:column;overflow:hidden;
+    width:100%!important;min-width:0!important;background:var(--bg)
   }
   #task-panel.mob-active,#notes-side.mob-active{display:flex}
 
-  /* Inside #notes-side: inbox-view and notes-area stack vertically.
-     Only one is shown at a time — JS controls notes-area display directly.
-     inbox-view uses .vis; hide it by default on mobile. */
-  #inbox-view{display:none;flex:1;flex-direction:column;overflow-y:auto;width:100%}
+  /* inbox-view shown via .vis (sits above notes-side) */
+  #inbox-view{z-index:10}
   #inbox-view.vis{display:flex}
 
-  /* contacts-view also uses .vis */
-  #contacts-view{display:none;flex:1;flex-direction:column;overflow-y:auto;
-    width:100%!important;min-width:0!important;max-width:100%!important;
-    position:static!important}
-  #contacts-view.vis{display:flex}
+  /* contacts-view already uses position:absolute + z-index:200 — works as-is on mobile */
 
-  /* notes-area: JS sets display:flex/none. When visible, row layout fills space */
-  #notes-area{flex:1;flex-direction:row;overflow:hidden;min-height:0}
+  /* notes-area fills notes-side entirely; JS sets display:flex/none */
+  #notes-area{flex:1;overflow:hidden;min-height:0;flex-direction:row}
 
-  /* notes-list and editor-panel: only one shown at a time via mob-active */
+  /* notes-list and editor-panel: only one visible at a time via mob-active */
   #notes-list,#editor-panel{
     display:none;flex:1;flex-direction:column;overflow:hidden;
     width:100%!important;min-width:0!important
@@ -78,7 +73,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:15
   /* Tasks view: completely hide fu-panel (it has its own tab) */
   #task-panel.mob-active[data-fu-mode="collapsed"] #fu-panel{display:none!important}
 
-  /* Follow-ups view: fu-mode=full hides task-scroll via followups.css — that's enough */
+  /* Hide email drop zone on mobile */
+  #email-drop-zone{display:none!important}
 }
 #panels{display:flex;flex:1;overflow:hidden}
 .resize-handle{width:5px;background:transparent;cursor:col-resize;flex-shrink:0;position:relative;z-index:10;transition:background var(--t)}

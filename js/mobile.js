@@ -16,46 +16,38 @@ function _isMob() { return _MOB_MQ.matches; }
 // showView() sets inline display styles that would fight our class approach,
 // so we bypass it entirely on mobile.
 
-// Top-level columns inside #panels
-const _MOB_COLUMNS = ['task-panel', 'notes-side'];
-
 function _mobShowOnly(screen) {
-  // screen is one of: 'tasks', 'followups', 'notes', 'editor', 'inbox', 'contacts'
+  // screen: 'tasks' | 'followups' | 'notes' | 'editor' | 'inbox' | 'contacts'
 
-  // Step 1: hide both top-level columns
-  _MOB_COLUMNS.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('mob-active');
-  });
+  // Hide all top-level screens
+  document.getElementById('task-panel')?.classList.remove('mob-active');
+  document.getElementById('notes-side')?.classList.remove('mob-active');
+  document.getElementById('inbox-view')?.classList.remove('vis');
+  document.getElementById('contacts-view')?.classList.remove('vis');
 
-  // Step 2: hide everything inside notes-side
-  const inboxView    = document.getElementById('inbox-view');
-  const contactsView = document.getElementById('contacts-view');
-  const notesArea    = document.getElementById('notes-area');
-  const notesList    = document.getElementById('notes-list');
-  const editorPanel  = document.getElementById('editor-panel');
-  if (inboxView)    inboxView.classList.remove('vis');
-  if (contactsView) contactsView.classList.remove('vis');
-  if (notesArea)    notesArea.style.display = 'none';
-  if (notesList)    notesList.classList.remove('mob-active');
-  if (editorPanel)  editorPanel.classList.remove('mob-active');
+  // Hide notes sub-panels
+  const notesArea   = document.getElementById('notes-area');
+  const notesList   = document.getElementById('notes-list');
+  const editorPanel = document.getElementById('editor-panel');
+  if (notesArea)   notesArea.style.display = 'none';
+  if (notesList)   notesList.classList.remove('mob-active');
+  if (editorPanel) editorPanel.classList.remove('mob-active');
 
-  // Step 3: show the right column and child
+  // Show the requested screen
   if (screen === 'tasks' || screen === 'followups') {
     document.getElementById('task-panel')?.classList.add('mob-active');
-  } else {
+  } else if (screen === 'inbox') {
+    document.getElementById('inbox-view')?.classList.add('vis');
+  } else if (screen === 'contacts') {
+    document.getElementById('contacts-view')?.classList.add('vis');
+  } else if (screen === 'notes') {
     document.getElementById('notes-side')?.classList.add('mob-active');
-    if (screen === 'inbox' && inboxView) {
-      inboxView.classList.add('vis');
-    } else if (screen === 'contacts' && contactsView) {
-      contactsView.classList.add('vis');
-    } else if (screen === 'notes' && notesArea && notesList) {
-      notesArea.style.display = 'flex';
-      notesList.classList.add('mob-active');
-    } else if (screen === 'editor' && notesArea && editorPanel) {
-      notesArea.style.display = 'flex';
-      editorPanel.classList.add('mob-active');
-    }
+    if (notesArea) notesArea.style.display = 'flex';
+    notesList?.classList.add('mob-active');
+  } else if (screen === 'editor') {
+    document.getElementById('notes-side')?.classList.add('mob-active');
+    if (notesArea) notesArea.style.display = 'flex';
+    editorPanel?.classList.add('mob-active');
   }
 }
 
