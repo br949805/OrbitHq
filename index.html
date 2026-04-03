@@ -79,7 +79,7 @@
         </div>
       </div>
       <div id="hm-footer">
-        <div id="file-status" class="fs-indicator" title="No file connected — data saved in browser only">
+        <div id="file-status" class="fs-indicator fs-only" title="No file connected — data saved in browser only">
           <span class="fs-dot disconnected"></span><span class="fs-name">localStorage</span>
         </div>
       </div>
@@ -105,12 +105,13 @@
       <button class="btn-pr" onclick="welcomeCreateNotebook()">Create Notebook</button>
     </div>
     <div id="welcome-divider">— or —</div>
-    <button class="btn-gh" id="welcome-open-btn" onclick="welcomeOpenNotebook()">↗ Open Notebook</button>
+    <button class="btn-gh fs-only" id="welcome-open-btn" onclick="welcomeOpenNotebook()">↗ Open Notebook</button>
+    <button class="btn-gh no-fs-only" id="welcome-import-btn" onclick="welcomeImportNotebook()">↗ Import Notebook JSON</button>
   </div>
 </div>
 
 <!-- RECONNECT BANNER -->
-<div id="reconnect-banner" style="display:none">
+<div id="reconnect-banner" class="fs-only" style="display:none">
   <span id="reconnect-msg">📂 <strong></strong> — Click to reconnect and load your data.</span>
   <button class="rb-btn" onclick="reconnectFile()">↺ Reconnect</button>
   <button class="rb-dismiss" onclick="document.getElementById('reconnect-banner').style.display='none'">✕</button>
@@ -129,7 +130,8 @@
     <div id="nb-dropdown">
       <div id="nb-list"></div>
       <div class="nb-action" onclick="openNewNotebookModal()"><span>+</span> Create Notebook</div>
-      <div class="nb-action" onclick="openNotebookAction()"><span>↗</span> Open Notebook</div>
+      <div class="nb-action fs-only" onclick="openNotebookAction()"><span>↗</span> Open Notebook</div>
+      <div class="nb-action no-fs-only" onclick="importNotebookAction()"><span>↗</span> Import Notebook JSON</div>
     </div>
   </div>
   <div class="sl" style="margin-top:0">Views</div>

@@ -338,17 +338,47 @@ async function welcomeCreateNotebook() {
   if (!name) { inp.style.borderColor = 'var(--red)'; inp.focus(); return; }
   inp.style.borderColor = '';
 
-  // File picker MUST be first — preserves the user gesture across async calls.
-  const handle = await _pickNotebookFile(name);
-  if (handle === 'cancelled') return;
-  if (handle === 'unsupported') { toast('File save not supported in this browser — use Chrome or Edge'); return; }
-  if (handle === 'insecure')    { toast('File save requires a web server — open via localhost, not file://'); return; }
-  if (handle === 'error')       { toast('Could not create notebook file — check browser permissions'); return; }
+  let handle = null;
+  if (isFSSupported()) {
+    // File picker MUST be first — preserves the user gesture across async calls.
+    handle = await _pickNotebookFile(name);
+    if (handle === 'cancelled') return;
+    if (handle === 'insecure') { toast('File save requires a web server — open via localhost, not file://'); return; }
+    if (handle === 'error')    { toast('Could not create notebook file — check browser permissions'); return; }
+    // 'unsupported' falls through as null (localStorage-only)
+  }
 
   const nb = await createNotebook(name, handle);
   setActiveId(nb.id);
   hideWelcomeOverlay();
   await _continueBoot();
+}
+
+async function welcomeImportNotebook() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.json';
+  inp.onchange = async () => {
+    const file = inp.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const derivedName = file.name.replace(/\.json$/i, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const id    = uid();
+      const lsKey = nbLsKey(id);
+      try { localStorage.setItem(lsKey, JSON.stringify(data)); } catch(e) {}
+      const entry = { id, name: derivedName, lsKey, hasFile: false, fileNameHint: null, createdAt: Date.now() };
+      NB_REGISTRY.push(entry);
+      saveRegistry();
+      setActiveId(entry.id);
+      hideWelcomeOverlay();
+      await _continueBoot();
+    } catch(e) {
+      toast('Could not read notebook file');
+    }
+  };
+  inp.click();
 }
 
 async function welcomeOpenNotebook() {
@@ -366,6 +396,32 @@ async function openNotebookAction() {
   await switchNotebook(entry.id);
 }
 
+// Mobile: import a notebook from a JSON file using <input type="file">.
+async function importNotebookAction() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.json';
+  inp.onchange = async () => {
+    const file = inp.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const derivedName = file.name.replace(/\.json$/i, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const id    = uid();
+      const lsKey = nbLsKey(id);
+      try { localStorage.setItem(lsKey, JSON.stringify(data)); } catch(e) {}
+      const entry = { id, name: derivedName, lsKey, hasFile: false, fileNameHint: null, createdAt: Date.now() };
+      NB_REGISTRY.push(entry);
+      saveRegistry();
+      await switchNotebook(entry.id);
+    } catch(e) {
+      toast('Could not read notebook file');
+    }
+  };
+  inp.click();
+}
+
 // ── Notebook CRUD modals ──────────────────────────────────────
 
 let _renamingNbId = null;
@@ -381,12 +437,14 @@ async function submitNewNotebook() {
   const name = document.getElementById('nb-name-inp').value.trim();
   if (!name) { document.getElementById('nb-name-inp').style.borderColor = 'var(--red)'; return; }
 
-  // File picker MUST be first — preserves the user gesture.
-  const handle = await _pickNotebookFile(name);
-  if (handle === 'cancelled') return;
-  if (handle === 'unsupported') { toast('File save not supported in this browser — use Chrome or Edge'); return; }
-  if (handle === 'insecure')    { toast('File save requires a web server — open via localhost, not file://'); return; }
-  if (handle === 'error')       { toast('Could not create notebook file — check browser permissions'); return; }
+  let handle = null;
+  if (isFSSupported()) {
+    // File picker MUST be first — preserves the user gesture.
+    handle = await _pickNotebookFile(name);
+    if (handle === 'cancelled') return;
+    if (handle === 'insecure') { toast('File save requires a web server — open via localhost, not file://'); return; }
+    if (handle === 'error')    { toast('Could not create notebook file — check browser permissions'); return; }
+  }
 
   closeModal('nb-modal');
   const nb = await createNotebook(name, handle);

@@ -78,6 +78,8 @@
 #ed-content th{background:var(--bg3);color:var(--text2);font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:6px 9px;border:1px solid var(--border);text-align:left}
 #ed-content td{padding:6px 9px;border:1px solid var(--border);font-size:14px;vertical-align:top}
 #ed-content tr:hover td{background:var(--bg3)}
+#ed-content img{max-width:100%;height:auto;display:block;border-radius:4px;margin:6px 0}
+#ed-content img:hover{outline:2px solid var(--accent)}
 .wiki-link{color:var(--blue);cursor:pointer;border-bottom:1px dashed var(--blue);text-decoration:none}
 .wiki-link:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .wiki-link.broken{color:var(--text3);border-bottom-color:var(--text3);text-decoration:line-through}

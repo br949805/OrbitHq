@@ -544,6 +544,50 @@ const edTitle   = document.getElementById('ed-title');
 
 edContent.addEventListener('input', () => { handleWikiInput(); handleContactInput(); handleSlashInput(); handleMarkdownInline(); scheduleAutosave(); });
 
+// ── Image Paste & Drag-Drop ───────────────────────────────────
+
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024; // 2 MB
+
+function insertImageFile(file) {
+  if (file.size > MAX_IMAGE_BYTES) {
+    alert(`Image is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum allowed size is 2 MB.`);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    document.execCommand('insertHTML', false,
+      `<img src="${ev.target.result}" style="max-width:100%;height:auto;display:block;margin:4px 0;" alt="pasted image">`
+    );
+    scheduleAutosave();
+  };
+  reader.readAsDataURL(file);
+}
+
+edContent.addEventListener('paste', e => {
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault();
+      const file = item.getAsFile();
+      if (file) insertImageFile(file);
+      return;
+    }
+  }
+});
+
+edContent.addEventListener('dragover', e => {
+  if ([...e.dataTransfer.items].some(i => i.type.startsWith('image/'))) e.preventDefault();
+});
+
+edContent.addEventListener('drop', e => {
+  const imageItem = [...e.dataTransfer.items].find(i => i.type.startsWith('image/'));
+  if (!imageItem) return;
+  e.preventDefault();
+  const file = imageItem.getAsFile();
+  if (file) insertImageFile(file);
+});
+
 edContent.addEventListener('click', e => {
   const chk = e.target.closest('.ti-chk');
   if (chk) { const item = chk.closest('.task-item'); if (item && item.dataset.taskId) { e.preventDefault(); toggleInlineTask(item.dataset.taskId); } }

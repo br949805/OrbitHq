@@ -6,6 +6,13 @@
 const NB_REGISTRY_KEY = 'nucleus_notebooks';
 const NB_ACTIVE_KEY   = 'nucleus_active_nb';
 
+function isFSSupported() {
+  return 'showSaveFilePicker' in window && 'showOpenFilePicker' in window;
+}
+
+// Apply .no-fs class immediately so CSS can hide file-only UI.
+if (!isFSSupported()) document.body.classList.add('no-fs');
+
 let NB_REGISTRY  = [];    // array of { id, name, lsKey, hasFile, fileNameHint, createdAt }
 let NB_ACTIVE_ID = null;  // string id of the active notebook
 
