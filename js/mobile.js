@@ -7,30 +7,78 @@ const _MOB_MQ = window.matchMedia('(max-width: 768px)');
 
 function _isMob() { return _MOB_MQ.matches; }
 
-// ── Panel activation ──────────────────────────────────────────
+// ── Screen switching ──────────────────────────────────────────
+// On mobile, exactly one screen fills the viewport at a time.
+// We hide every panel then show just the one we want.
+//
+// Complication: #task-panel, #notes-list, and #editor-panel live inside
+// a flex wrapper (#panels → inner div → #notes-area) alongside #inbox-view.
+// showView() sets inline display styles that would fight our class approach,
+// so we bypass it entirely on mobile.
 
-const _MOB_PANEL_IDS = ['task-panel','notes-list','editor-panel','inbox-view','contacts-view'];
+const _MOB_ALL_PANELS = ['task-panel', 'notes-list', 'editor-panel', 'inbox-view', 'contacts-view'];
 
-function _mobActivate(panelId) {
-  _MOB_PANEL_IDS.forEach(id => {
+function _mobShowOnly(panelId) {
+  // Hide all panels (mob-active class)
+  _MOB_ALL_PANELS.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('mob-active');
   });
-  const target = document.getElementById(panelId);
-  if (target) target.classList.add('mob-active');
+
+  // contacts-view and inbox-view use .vis instead of .mob-active — clear both
+  const contactsView = document.getElementById('contacts-view');
+  if (contactsView) contactsView.classList.remove('vis');
+  const inboxView = document.getElementById('inbox-view');
+  if (inboxView) inboxView.classList.remove('vis');
+
+  // notes-area wraps notes-list + editor-panel; show it only for those screens
+  const notesArea = document.getElementById('notes-area');
+  if (notesArea) {
+    notesArea.style.display = (panelId === 'notes-list' || panelId === 'editor-panel') ? 'flex' : 'none';
+  }
+
+  // For vis-based panels, add .vis instead of .mob-active
+  if (panelId === 'inbox-view' && inboxView) {
+    inboxView.classList.add('vis');
+  } else if (panelId === 'contacts-view' && contactsView) {
+    contactsView.classList.add('vis');
+  } else {
+    const target = document.getElementById(panelId);
+    if (target) target.classList.add('mob-active');
+  }
 }
 
 // ── Tab navigation ────────────────────────────────────────────
 
-const _MOB_ACTIONS = {
-  tasks:     () => { showView('dashboard'); _mobActivate('task-panel'); },
-  notes:     () => { showView('dashboard'); _mobActivate('notes-list'); },
-  inbox:     () => { showView('inbox');     _mobActivate('inbox-view'); },
-  followups: () => { showView('dashboard'); setFuMode('full'); _mobActivate('task-panel'); },
-  contacts:  () => { showContacts();        _mobActivate('contacts-view'); },
-};
-
 let _mobCurrentTab = 'tasks';
+
+const _MOB_ACTIONS = {
+  tasks: () => {
+    // Show tasks only — hide follow-ups by setting fu-mode to collapsed
+    setFuMode('collapsed');
+    renderTasks();
+    _mobShowOnly('task-panel');
+  },
+  followups: () => {
+    // Show follow-ups only — use fu-mode full which hides task-scroll
+    setFuMode('full');
+    renderFollowUps();
+    _mobShowOnly('task-panel');
+  },
+  notes: () => {
+    renderNotesList();
+    _mobShowOnly('notes-list');
+  },
+  inbox: () => {
+    renderInbox();
+    updateInboxStats();
+    _mobShowOnly('inbox-view');
+  },
+  contacts: () => {
+    if (typeof showContacts === 'function') showContacts();
+    _mobShowOnly('contacts-view');
+  },
+};
 
 function mobNav(tab) {
   if (!_isMob()) return;
@@ -48,8 +96,7 @@ function mobNav(tab) {
 // Called at the end of openNote() in editor.js.
 function mobOpenNote() {
   if (!_isMob()) return;
-  _mobActivate('editor-panel');
-  // Mark Notes tab active since we came from notes list
+  _mobShowOnly('editor-panel');
   document.querySelectorAll('.mob-tab').forEach(el => el.classList.remove('mob-active'));
   const notesTab = document.getElementById('mnt-notes');
   if (notesTab) notesTab.classList.add('mob-active');
@@ -58,7 +105,7 @@ function mobOpenNote() {
 // Back button in editor header → return to notes list.
 function mobBack() {
   if (!_isMob()) return;
-  _mobActivate('notes-list');
+  _mobShowOnly('notes-list');
   document.querySelectorAll('.mob-tab').forEach(el => el.classList.remove('mob-active'));
   const notesTab = document.getElementById('mnt-notes');
   if (notesTab) notesTab.classList.add('mob-active');

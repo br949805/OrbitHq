@@ -38,11 +38,40 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:15
 @media(max-width:768px){
   #main{flex-direction:column}
   #panels{flex-direction:column;position:relative;flex:1;overflow:hidden}
-  #task-panel,#notes-list,#editor-panel,#inbox-view,#contacts-view{width:100%!important;min-width:0!important;max-width:100%!important;flex-shrink:0;display:none;flex:1;overflow-y:auto;height:auto}
-  #task-panel.mob-active,#notes-list.mob-active,#editor-panel.mob-active,#inbox-view.mob-active,#contacts-view.mob-active{display:flex;flex-direction:column}
+
+  /* All panels hidden by default; only the .mob-active one shows */
+  #task-panel,#notes-list,#editor-panel{
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    flex-shrink:0;display:none;flex:1;overflow-y:auto;height:auto
+  }
+  #task-panel.mob-active,#notes-list.mob-active,#editor-panel.mob-active{
+    display:flex;flex-direction:column
+  }
+
+  /* inbox-view and contacts-view use .vis — override to full-screen on mobile */
+  #inbox-view,#contacts-view{
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    flex-shrink:0;flex:1;overflow-y:auto;height:auto;
+    position:static!important;display:none
+  }
+  #inbox-view.vis,#contacts-view.vis{display:flex;flex-direction:column}
+
+  /* notes-area is a flex wrapper; JS controls its display directly */
+  #notes-area{flex-direction:row;flex:1;overflow:hidden;min-height:0}
+  /* notes-list and editor-panel inside notes-area are individually controlled by mob-active */
+  #notes-area #notes-list,#notes-area #editor-panel{flex:1}
+
+  /* Hide all resize handles and drawer tabs */
   .resize-handle{display:none!important}
   .drawer-tab{display:none!important}
-  #notes-area{display:flex!important;flex-direction:column;flex:1;overflow:hidden}
+
+  /* Hide task panel collapse/expand controls */
+  #task-collapse-btn,#notes-collapse-btn{display:none!important}
+
+  /* Follow-ups: when task-panel is mob-active with fu-mode=full,
+     only fu-panel is visible (handled by existing followups.css rules).
+     When fu-mode=collapsed, fu-panel is header-only which is fine for tasks view. */
+  #task-panel.mob-active[data-fu-mode="collapsed"] #fu-panel{display:none!important}
 }
 #panels{display:flex;flex:1;overflow:hidden}
 .resize-handle{width:5px;background:transparent;cursor:col-resize;flex-shrink:0;position:relative;z-index:10;transition:background var(--t)}
