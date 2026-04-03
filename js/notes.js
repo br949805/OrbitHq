@@ -90,4 +90,5 @@ function updateNoteBadges() {
   const counts = { all:0, pinned:0, scratchpad:0, meeting:0, snippet:0, idea:0, plan:0, note:0 };
   S.notes.forEach(n => { counts.all++; if (n.pinned) counts.pinned++; if (counts[n.type] !== undefined) counts[n.type]++; });
   Object.keys(counts).forEach(k => { const el = document.getElementById('nb-' + k); if (el) el.textContent = counts[k]; });
+  if (typeof updateMobBadges === 'function') updateMobBadges();
 }

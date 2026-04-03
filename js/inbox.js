@@ -22,6 +22,7 @@ function updateInboxBadge() {
   document.getElementById('sb-inbox-badge').classList.toggle('red', ct > 0);
   const tbadge = document.getElementById('inbox-tb-badge');
   tbadge.textContent = ct; tbadge.classList.toggle('show', ct > 0);
+  if (typeof updateMobBadges === 'function') updateMobBadges();
 }
 
 function updateInboxStats() {

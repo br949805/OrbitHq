@@ -32,3 +32,14 @@
 .rb-btn:hover{opacity:.85}
 .rb-dismiss{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0 4px;line-height:1;margin-left:auto}
 .rb-dismiss:hover{color:var(--text)}
+
+/* ── Mobile topbar ───────────────────────────────────────────── */
+@media(max-width:768px){
+  #topbar{height:56px;padding:0 12px;gap:8px}
+  #logo{display:none}
+  .tb-logo{height:32px;width:32px}
+  #logo-wrap{margin-right:0;gap:0}
+  #search-wrap{flex:1}
+  #search-input{font-size:13px}
+  #hamburger-dropdown{min-width:0;width:100vw;right:-12px;border-radius:0 0 8px 8px}
+}

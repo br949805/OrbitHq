@@ -102,6 +102,7 @@ function openNote(id, pushHistory = true) {
   document.querySelectorAll('#ed-content .contact-link').forEach(a => {
     a.onclick = (e) => { e.preventDefault(); showView('contacts'); };
   });
+  if (typeof mobOpenNote === 'function') mobOpenNote();
 }
 
 function navBack() {

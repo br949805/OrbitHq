@@ -20,6 +20,30 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:15
 .no-fs .no-fs-only{display:block}
 /* ─────────────────────────────────────────────────────────────── */
 #main{display:flex;flex:1;overflow:hidden}
+
+/* ── Mobile bottom nav (hidden on desktop) ───────────────────── */
+#mobile-nav{display:none}
+@media(max-width:768px){
+  #mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--bg2);border-top:1px solid var(--border);z-index:300;align-items:stretch}
+  .mob-tab{flex:1;background:none;border:none;color:var(--text3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;position:relative;transition:color var(--t);padding:6px 0 4px;-webkit-tap-highlight-color:transparent}
+  .mob-tab.mob-active{color:var(--accent)}
+  .mob-tab-ic{font-size:18px;line-height:1}
+  .mob-tab-lbl{font-size:10px;font-family:var(--sans);font-weight:600;letter-spacing:.03em}
+  .mob-tab-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:9px;font-weight:700;font-family:var(--sans);border-radius:8px;padding:0 4px;min-width:14px;text-align:center;display:none}
+  .mob-tab-badge.show{display:block}
+  #mobile-nav-spacer{height:60px;flex-shrink:0}
+}
+
+/* ── Mobile layout overrides ─────────────────────────────────── */
+@media(max-width:768px){
+  #main{flex-direction:column}
+  #panels{flex-direction:column;position:relative;flex:1;overflow:hidden}
+  #task-panel,#notes-list,#editor-panel,#inbox-view,#contacts-view{width:100%!important;min-width:0!important;max-width:100%!important;flex-shrink:0;display:none;flex:1;overflow-y:auto;height:auto}
+  #task-panel.mob-active,#notes-list.mob-active,#editor-panel.mob-active,#inbox-view.mob-active,#contacts-view.mob-active{display:flex;flex-direction:column}
+  .resize-handle{display:none!important}
+  .drawer-tab{display:none!important}
+  #notes-area{display:flex!important;flex-direction:column;flex:1;overflow:hidden}
+}
 #panels{display:flex;flex:1;overflow:hidden}
 .resize-handle{width:5px;background:transparent;cursor:col-resize;flex-shrink:0;position:relative;z-index:10;transition:background var(--t)}
 .resize-handle::before{content:'';position:absolute;top:0;bottom:0;left:-4px;right:-4px}

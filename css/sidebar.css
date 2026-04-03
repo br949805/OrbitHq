@@ -48,3 +48,5 @@
 .nb-row-actions button:hover{color:var(--text);background:var(--bg4,var(--bg2))}
 .nb-action{display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;color:var(--text3);font-size:12px;border-top:1px solid var(--border);transition:color var(--t)}
 .nb-action:hover{color:var(--accent)}
+
+@media(max-width:768px){#sidebar{display:none!important}}
