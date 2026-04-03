@@ -34,47 +34,50 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:15
   #mobile-nav-spacer{height:60px;flex-shrink:0}
 }
 
-/* ── Mobile layout overrides ─────────────────────────────────── */
+/* ── Mobile shell ────────────────────────────────────────────── */
+/* JS re-parents panels into #mob-shell and hides #main entirely. */
 @media(max-width:768px){
-  #main{flex-direction:column}
-
-  /* #panels is the positioning context for all mobile screens */
-  #panels{flex:1;overflow:hidden;position:relative}
-
-  /* Every screen is a full-size absolute layer — only one visible at a time */
-  #task-panel,#notes-side,#inbox-view{
-    position:absolute;inset:0;
-    display:none;flex-direction:column;overflow:hidden;
-    width:100%!important;min-width:0!important;background:var(--bg)
+  #mob-shell{
+    position:fixed;inset:0;bottom:60px;
+    display:flex;flex-direction:column;
+    background:var(--bg);overflow:hidden;
+    z-index:100
   }
-  #task-panel.mob-active,#notes-side.mob-active{display:flex}
 
-  /* inbox-view shown via .vis (sits above notes-side) */
-  #inbox-view{z-index:10}
-  #inbox-view.vis{display:flex}
-
-  /* contacts-view already uses position:absolute + z-index:200 — works as-is on mobile */
-
-  /* notes-area fills notes-side entirely; JS sets display:flex/none */
-  #notes-area{flex:1;overflow:hidden;min-height:0;flex-direction:row}
-
-  /* notes-list and editor-panel: only one visible at a time via mob-active */
-  #notes-list,#editor-panel{
-    display:none;flex:1;flex-direction:column;overflow:hidden;
-    width:100%!important;min-width:0!important
+  /* Every panel is a direct child of #mob-shell — fill it completely */
+  #mob-shell > #task-panel,
+  #mob-shell > #fu-panel,
+  #mob-shell > #inbox-view,
+  #mob-shell > #notes-list,
+  #mob-shell > #editor-panel,
+  #mob-shell > #contacts-view{
+    display:none;
+    flex-direction:column;
+    flex:1;
+    overflow-y:auto;
+    width:100%;
+    min-width:0;
+    /* reset any desktop sizing */
+    position:static!important;
+    height:100%!important;
+    max-height:100%!important;
+    border:none!important
   }
-  #notes-list.mob-active,#editor-panel.mob-active{display:flex}
 
-  /* Hide resize handles, drawer tabs, collapse buttons */
-  .resize-handle{display:none!important}
-  .drawer-tab{display:none!important}
-  #task-collapse-btn,#notes-collapse-btn{display:none!important}
+  /* JS sets display:flex to show the active panel */
 
-  /* Tasks view: completely hide fu-panel (it has its own tab) */
-  #task-panel.mob-active[data-fu-mode="collapsed"] #fu-panel{display:none!important}
+  /* Hide desktop chrome that leaks into re-parented panels */
+  #mob-shell .resize-handle{display:none!important}
+  #mob-shell .drawer-tab{display:none!important}
+  #mob-shell #task-collapse-btn,
+  #mob-shell #notes-collapse-btn{display:none!important}
+  #mob-shell #email-drop-zone{display:none!important}
 
-  /* Hide email drop zone on mobile */
-  #email-drop-zone{display:none!important}
+  /* fu-panel: reset desktop border/sizing so it fills the shell */
+  #mob-shell > #fu-panel{border-top:none!important}
+
+  /* editor-panel needs overflow on its scroll container, not itself */
+  #mob-shell > #editor-panel{overflow:hidden}
 }
 #panels{display:flex;flex:1;overflow:hidden}
 .resize-handle{width:5px;background:transparent;cursor:col-resize;flex-shrink:0;position:relative;z-index:10;transition:background var(--t)}

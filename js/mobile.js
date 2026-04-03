@@ -1,53 +1,68 @@
 // ── mobile.js ─────────────────────────────────────────────────
-// Mobile navigation and panel management.
-// Only activates on screens ≤ 768px. All desktop behaviour unchanged.
+// Mobile navigation. Only activates on screens ≤ 768px.
+// On boot, physically re-parents the app's existing panel DOM nodes
+// into a clean #mob-shell div so there are no nested flex conflicts.
+// Desktop #main is hidden entirely on mobile. All render functions
+// (renderTasks, renderNotesList, etc.) continue targeting the same
+// element IDs — they just now live inside the shell.
 // ──────────────────────────────────────────────────────────────
 
 const _MOB_MQ = window.matchMedia('(max-width: 768px)');
-
 function _isMob() { return _MOB_MQ.matches; }
 
+// ── Boot: build the shell and re-parent panels ────────────────
+
+function _mobBuildShell() {
+  // Create the full-screen shell
+  const shell = document.createElement('div');
+  shell.id = 'mob-shell';
+  document.body.appendChild(shell);
+
+  // Panels to re-parent, in order. Each becomes a direct child of shell.
+  // We pull them from wherever they currently live in the desktop DOM.
+  const ids = ['task-panel', 'fu-panel', 'inbox-view', 'notes-list', 'editor-panel', 'contacts-view'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) shell.appendChild(el);
+  });
+
+  // Hide the entire desktop layout
+  const main = document.getElementById('main');
+  if (main) main.style.display = 'none';
+
+  // Also hide the desktop nudge bar and panels wrapper (they're outside #main)
+  // They live in the anonymous wrapper div between sidebar and panels
+  const panels = document.getElementById('panels');
+  if (panels && panels.parentElement && panels.parentElement !== main) {
+    panels.parentElement.style.display = 'none';
+  }
+}
+
 // ── Screen switching ──────────────────────────────────────────
-// On mobile, exactly one screen fills the viewport at a time.
-// We hide every panel then show just the one we want.
-//
-// Complication: #task-panel, #notes-list, and #editor-panel live inside
-// a flex wrapper (#panels → inner div → #notes-area) alongside #inbox-view.
-// showView() sets inline display styles that would fight our class approach,
-// so we bypass it entirely on mobile.
+// Each panel is now a direct child of #mob-shell.
+// Only one is visible at a time — we set display:flex/none directly.
+
+const _MOB_PANELS = ['task-panel', 'fu-panel', 'inbox-view', 'notes-list', 'editor-panel', 'contacts-view'];
 
 function _mobShowOnly(screen) {
-  // screen: 'tasks' | 'followups' | 'notes' | 'editor' | 'inbox' | 'contacts'
+  // Hide every panel
+  _MOB_PANELS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
 
-  // Hide all top-level screens
-  document.getElementById('task-panel')?.classList.remove('mob-active');
-  document.getElementById('notes-side')?.classList.remove('mob-active');
-  document.getElementById('inbox-view')?.classList.remove('vis');
-  document.getElementById('contacts-view')?.classList.remove('vis');
+  // Show the one we want
+  let show = null;
+  if (screen === 'tasks')    show = 'task-panel';
+  if (screen === 'followups') show = 'fu-panel';
+  if (screen === 'notes')    show = 'notes-list';
+  if (screen === 'editor')   show = 'editor-panel';
+  if (screen === 'inbox')    show = 'inbox-view';
+  if (screen === 'contacts') show = 'contacts-view';
 
-  // Hide notes sub-panels
-  const notesArea   = document.getElementById('notes-area');
-  const notesList   = document.getElementById('notes-list');
-  const editorPanel = document.getElementById('editor-panel');
-  if (notesArea)   notesArea.style.display = 'none';
-  if (notesList)   notesList.classList.remove('mob-active');
-  if (editorPanel) editorPanel.classList.remove('mob-active');
-
-  // Show the requested screen
-  if (screen === 'tasks' || screen === 'followups') {
-    document.getElementById('task-panel')?.classList.add('mob-active');
-  } else if (screen === 'inbox') {
-    document.getElementById('inbox-view')?.classList.add('vis');
-  } else if (screen === 'contacts') {
-    document.getElementById('contacts-view')?.classList.add('vis');
-  } else if (screen === 'notes') {
-    document.getElementById('notes-side')?.classList.add('mob-active');
-    if (notesArea) notesArea.style.display = 'flex';
-    notesList?.classList.add('mob-active');
-  } else if (screen === 'editor') {
-    document.getElementById('notes-side')?.classList.add('mob-active');
-    if (notesArea) notesArea.style.display = 'flex';
-    editorPanel?.classList.add('mob-active');
+  if (show) {
+    const el = document.getElementById(show);
+    if (el) el.style.display = 'flex';
   }
 }
 
@@ -57,12 +72,10 @@ let _mobCurrentTab = 'tasks';
 
 const _MOB_ACTIONS = {
   tasks: () => {
-    setFuMode('collapsed');
     renderTasks();
     _mobShowOnly('tasks');
   },
   followups: () => {
-    setFuMode('full');
     renderFollowUps();
     _mobShowOnly('followups');
   },
@@ -94,7 +107,6 @@ function mobNav(tab) {
 
 // ── Note open / back ──────────────────────────────────────────
 
-// Called at the end of openNote() in editor.js.
 function mobOpenNote() {
   if (!_isMob()) return;
   _mobShowOnly('editor');
@@ -103,7 +115,6 @@ function mobOpenNote() {
   if (notesTab) notesTab.classList.add('mob-active');
 }
 
-// Back button in editor header → return to notes list.
 function mobBack() {
   if (!_isMob()) return;
   _mobShowOnly('notes');
@@ -129,11 +140,11 @@ function updateMobBadges() {
   if (fuEl)    { fuEl.textContent    = fuCount    || ''; fuEl.classList.toggle('show',    fuCount    > 0); }
 }
 
-// ── Boot: initialise default panel on mobile ─────────────────
+// ── Boot ─────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (_isMob()) {
-    // Defer until the app's own boot has run (app.js calls _continueBoot)
-    requestAnimationFrame(() => requestAnimationFrame(() => mobNav('tasks')));
-  }
+  if (!_isMob()) return;
+  _mobBuildShell();
+  // Defer nav until app.js _continueBoot has finished rendering
+  requestAnimationFrame(() => requestAnimationFrame(() => mobNav('tasks')));
 });
