@@ -1,4 +1,4 @@
-const CACHE = 'orbithq-v1';
+const CACHE = 'orbithq-__BUILDTIME__';
 
 const ASSETS = [
   './',
