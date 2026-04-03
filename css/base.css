@@ -24,21 +24,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:15
 /* ── Mobile bottom nav (hidden on desktop) ───────────────────── */
 #mobile-nav{display:none}
 @media(max-width:768px){
-  #mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--bg2);border-top:1px solid var(--border);z-index:300;align-items:stretch}
-  .mob-tab{flex:1;background:none;border:none;color:var(--text3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;position:relative;transition:color var(--t);padding:6px 0 4px;-webkit-tap-highlight-color:transparent}
+  #mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:64px;background:var(--bg2);border-top:1px solid var(--border);z-index:300;align-items:stretch;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .mob-tab{flex:1;background:none;border:none;color:var(--text3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;position:relative;transition:color var(--t);padding:8px 2px 6px;-webkit-tap-highlight-color:transparent;min-height:44px}
   .mob-tab.mob-active{color:var(--accent)}
-  .mob-tab-ic{font-size:18px;line-height:1}
-  .mob-tab-lbl{font-size:10px;font-family:var(--sans);font-weight:600;letter-spacing:.03em}
-  .mob-tab-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:9px;font-weight:700;font-family:var(--sans);border-radius:8px;padding:0 4px;min-width:14px;text-align:center;display:none}
+  .mob-tab-ic{font-size:22px;line-height:1}
+  .mob-tab-lbl{font-size:10px;font-family:var(--sans);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+  .mob-tab-badge{position:absolute;top:5px;right:calc(50% - 20px);background:var(--red);color:#fff;font-size:9px;font-weight:700;font-family:var(--sans);border-radius:8px;padding:0 4px;min-width:15px;text-align:center;display:none}
   .mob-tab-badge.show{display:block}
-  #mobile-nav-spacer{height:60px;flex-shrink:0}
+  #mobile-nav-spacer{height:64px;flex-shrink:0}
 }
 
 /* ── Mobile shell ────────────────────────────────────────────── */
 /* JS re-parents panels into #mob-shell and hides #main entirely. */
 @media(max-width:768px){
   #mob-shell{
-    position:fixed;inset:0;bottom:60px;
+    position:fixed;inset:0;bottom:64px;
     display:flex;flex-direction:column;
     background:var(--bg);overflow:hidden;
     z-index:100

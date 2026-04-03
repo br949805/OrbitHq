@@ -71,3 +71,22 @@
 .edz-icon{font-size:14px;opacity:.6;flex-shrink:0}
 .edz-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #email-drop-zone.drag-over{border-color:var(--accent);color:var(--accent);background:var(--bg3);border-style:solid}
+
+/* ── Mobile tasks panel ───────────────────────────────────────── */
+@media(max-width:768px){
+  #tp-header{padding:10px 14px 8px}
+  #tp-header h2{font-size:17px}
+  .add-task-btn{font-size:13px;padding:7px 14px;min-height:36px}
+  /* Task rows: larger touch targets */
+  .trow{padding:10px 14px;gap:10px}
+  .tchk{width:20px;height:20px;border-radius:4px;margin-top:1px}
+  .ttitle{font-size:15px}
+  .tmeta{gap:8px;margin-top:3px}
+  .tdate{font-size:12px;padding:2px 6px}
+  .tsec-hdr{padding:7px 14px}
+  .tsec-name{font-size:12px}
+  /* Actions always visible on mobile (no hover) */
+  .tactions{display:flex}
+  .tax{font-size:16px;padding:4px 8px;min-height:36px;min-width:36px;display:flex;align-items:center;justify-content:center}
+  #archive-link{font-size:13px;padding:12px 14px}
+}

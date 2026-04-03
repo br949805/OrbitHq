@@ -12,3 +12,11 @@
 .sr-item .sr-title{flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sr-item .sr-meta{font-size:12px;color:var(--text3);flex-shrink:0}
 .sr-empty{padding:12px;font-size:13px;color:var(--text3);text-align:center}
+
+/* ── Mobile search ────────────────────────────────────────────── */
+@media(max-width:768px){
+  #search-wrap{width:auto;flex:1;min-width:0}
+  #search-input{font-size:15px;padding:8px 10px 8px 30px;height:40px}
+  #search-results{position:fixed;top:52px;left:0;right:0;border-radius:0 0 8px 8px;max-height:60vh;z-index:400}
+  .sr-item{padding:11px 14px;font-size:15px}
+}

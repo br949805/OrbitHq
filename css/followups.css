@@ -267,3 +267,18 @@
   color: var(--green);
   border-top: 1px solid var(--border);
 }
+
+/* ── Mobile follow-ups panel ──────────────────────────────────── */
+@media(max-width:768px){
+  #fu-header{padding:10px 12px;min-height:46px}
+  #fu-header h3{font-size:12px}
+  .add-task-btn{font-size:13px;padding:7px 14px;min-height:36px}
+  .fu-row{padding:10px 12px;gap:10px}
+  .fu-chk{width:20px;height:20px;margin-top:1px}
+  .fu-title{font-size:15px}
+  .fu-meta{gap:7px;margin-top:4px}
+  .fu-date{font-size:12px}
+  /* Actions always visible on mobile */
+  .fu-actions{display:flex}
+  .fu-tax{display:flex}
+}

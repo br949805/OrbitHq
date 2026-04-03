@@ -35,11 +35,15 @@
 
 /* ── Mobile topbar ───────────────────────────────────────────── */
 @media(max-width:768px){
-  #topbar{height:56px;padding:0 12px;gap:8px}
+  #topbar{height:52px;padding:0 10px;gap:6px;overflow:visible}
   #logo{display:none}
-  .tb-logo{height:32px;width:32px}
-  #logo-wrap{margin-right:0;gap:0}
-  #search-wrap{flex:1}
-  #search-input{font-size:13px}
-  #hamburger-dropdown{min-width:0;width:100vw;right:-12px;border-radius:0 0 8px 8px}
+  .tb-logo{height:28px;width:28px}
+  #logo-wrap{margin-right:4px;gap:0;flex-shrink:0}
+  #tb-right{gap:6px;min-width:0;flex:1}
+  #search-wrap{flex:1;min-width:0}
+  #search-input{font-size:14px;padding:6px 8px;min-width:0}
+  .tb-icon{width:40px;height:40px;font-size:18px;flex-shrink:0}
+  #hamburger-dropdown{min-width:0;width:100vw;right:-10px;border-radius:0 0 8px 8px;max-height:calc(100vh - 52px);overflow-y:auto}
+  /* Keep the settings panel scrollable and padded on mobile */
+  #settings-panel{padding:14px 16px}
 }

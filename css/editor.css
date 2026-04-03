@@ -141,11 +141,27 @@
 .bl-link:hover{text-decoration:underline}
 .bl-empty{font-size:12px;color:var(--text3);font-style:italic}
 
-/* ── Mobile editor back button ───────────────────────────────── */
+/* ── Mobile editor ───────────────────────────────────────────── */
 #ed-mob-back{display:none}
 @media(max-width:768px){
-  #ed-mob-back{display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--text2);font-size:22px;padding:0 10px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+  /* Back button: big tap target */
+  #ed-mob-back{display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--text2);font-size:24px;padding:0 12px 0 4px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;min-width:44px;min-height:44px}
   #ed-mob-back:hover{color:var(--text)}
-  #ed-toolbar{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+
+  /* Editor header layout: title full width, buttons wrap below */
+  #ed-header{padding:8px 12px;gap:6px;flex-wrap:wrap;align-items:flex-start}
+  #ed-title{font-size:18px;width:100%;order:1;min-width:0;padding:2px 0}
+  #ed-mob-back{order:0}
+  #ed-back{order:0}
+  .ed-hdr-btns{order:2;width:100%;display:flex;gap:6px;flex-wrap:wrap}
+  .ed-btn{font-size:13px;padding:7px 12px;min-height:36px;flex:1;text-align:center;justify-content:center}
+  .ed-btn.danger{flex:0 0 auto}
+
+  /* Toolbar: horizontal scroll */
+  #ed-toolbar{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;padding:6px 10px;gap:2px}
   #ed-toolbar::-webkit-scrollbar{display:none}
+  .tbb{font-size:14px;padding:6px 8px;min-height:34px}
+
+  /* Content area: comfortable padding */
+  #ed-content{padding:14px 16px 40px;font-size:15px}
 }

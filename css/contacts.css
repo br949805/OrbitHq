@@ -219,3 +219,12 @@
   padding-top: 4px;
   flex-shrink: 0;
 }
+
+/* ── Mobile contacts ──────────────────────────────────────────── */
+@media(max-width:768px){
+  #cv-hdr{padding:12px 14px;gap:8px;flex-wrap:wrap}
+  #cv-hdr h2{font-size:20px;flex:1}
+  #cv-search{font-size:15px;padding:8px 10px;height:40px;order:3;width:100%;flex:none}
+  #cv-hdr .btn-pr{min-height:36px;font-size:13px}
+  #cv-hdr .btn-gh{min-height:36px;font-size:13px}
+}

@@ -273,6 +273,18 @@
       <div style="display:flex;flex:1;overflow:hidden" id="notes-area">
         <div id="notes-list">
           <div id="nl-header"><h3 id="nl-heading">All Notes</h3><button class="new-note-btn" onclick="openTypeSelector()">+ Add Note</button><button class="panel-collapse-btn" id="notes-collapse-btn" onclick="toggleNotesPanel()" title="Collapse">‹</button></div>
+          <!-- Mobile-only filter/folder strip -->
+          <div id="mob-notes-filter-bar">
+            <button class="mob-nf-chip mob-nf-active" onclick="mobNoteFilter('all',this)">All</button>
+            <button class="mob-nf-chip" onclick="mobNoteFilter('pinned',this)">⊙ Pinned</button>
+            <button class="mob-nf-chip" onclick="mobNoteFilter('type:scratchpad',this)">✦ Scratch</button>
+            <button class="mob-nf-chip" onclick="mobNoteFilter('type:meeting',this)">◉ Meeting</button>
+            <button class="mob-nf-chip" onclick="mobNoteFilter('type:snippet',this)">⌨ Snippet</button>
+            <button class="mob-nf-chip" onclick="mobNoteFilter('type:idea',this)">◎ Idea</button>
+            <button class="mob-nf-chip" onclick="mobNoteFilter('type:plan',this)">▦ Plan</button>
+            <button class="mob-nf-chip" onclick="mobNoteFilter('type:note',this)">○ Note</button>
+            <button class="mob-nf-chip mob-nf-folders" onclick="openMobFolderPicker()">📁 Folders</button>
+          </div>
           <div id="nl-scroll"></div>
           <div class="drawer-tab" onclick="toggleNotesPanel()"><span class="drawer-label" id="notes-drawer-label">All Notes</span></div>
         </div>
@@ -681,6 +693,14 @@
     <div class="mft"><button class="btn-gh" onclick="_confirmCancel()">Cancel</button><button class="btn-dr" onclick="_confirmOk()">Delete</button></div>
   </div>
 </div>
+<!-- MOBILE FOLDER PICKER (notes filter) -->
+<div class="mo" id="mob-folder-modal" onclick="handleMoClick(event,'mob-folder-modal')">
+  <div class="mb" style="max-height:80vh;display:flex;flex-direction:column">
+    <div class="mh"><h3>Browse Notes</h3><button class="mc" onclick="closeModal('mob-folder-modal')">✕</button></div>
+    <div id="mob-folder-body" style="overflow-y:auto;flex:1;padding:10px 0"></div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 

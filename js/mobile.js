@@ -140,6 +140,70 @@ function updateMobBadges() {
   if (fuEl)    { fuEl.textContent    = fuCount    || ''; fuEl.classList.toggle('show',    fuCount    > 0); }
 }
 
+// ── Mobile note filter chip helper ───────────────────────────
+
+function mobNoteFilter(filter, el) {
+  if (!_isMob()) return;
+  document.querySelectorAll('.mob-nf-chip').forEach(c => c.classList.remove('mob-nf-active'));
+  if (el) el.classList.add('mob-nf-active');
+  setNoteFilter(filter, null);
+}
+
+// ── Mobile folder picker ──────────────────────────────────────
+
+function openMobFolderPicker() {
+  if (!_isMob()) return;
+  const body = document.getElementById('mob-folder-body');
+  if (!body) return;
+  body.innerHTML = '';
+
+  // All Notes shortcut
+  const allRow = document.createElement('div');
+  allRow.className = 'mob-folder-row';
+  allRow.innerHTML = '<span class="mob-folder-ic">◈</span><span>All Notes</span>';
+  allRow.onclick = () => { mobNoteFilter('all', null); _resetMobNFChip('all'); closeModal('mob-folder-modal'); };
+  body.appendChild(allRow);
+
+  // Pinned
+  const pinRow = document.createElement('div');
+  pinRow.className = 'mob-folder-row';
+  pinRow.innerHTML = '<span class="mob-folder-ic">⊙</span><span>Pinned</span>';
+  pinRow.onclick = () => { mobNoteFilter('pinned', null); _resetMobNFChip('pinned'); closeModal('mob-folder-modal'); };
+  body.appendChild(pinRow);
+
+  // Folders
+  if (S.folders && S.folders.length) {
+    const hdr = document.createElement('div');
+    hdr.className = 'mob-folder-sec';
+    hdr.textContent = 'Folders';
+    body.appendChild(hdr);
+    S.folders.forEach(f => {
+      const row = document.createElement('div');
+      row.className = 'mob-folder-row';
+      row.innerHTML = `<span class="mob-folder-ic">📁</span><span>${esc(f.name)}</span>`;
+      row.onclick = () => {
+        setNoteFilter('folder:' + f.id, null);
+        document.getElementById('nl-heading').textContent = f.name;
+        _resetMobNFChip('folder');
+        closeModal('mob-folder-modal');
+      };
+      body.appendChild(row);
+    });
+  }
+
+  document.getElementById('mob-folder-modal').classList.add('open');
+}
+
+function _resetMobNFChip(filter) {
+  document.querySelectorAll('.mob-nf-chip').forEach(c => c.classList.remove('mob-nf-active'));
+  // Highlight chip that matches filter, if it exists
+  const map = {'all':0,'pinned':1};
+  if (filter in map) {
+    const chips = document.querySelectorAll('.mob-nf-chip');
+    if (chips[map[filter]]) chips[map[filter]].classList.add('mob-nf-active');
+  }
+}
+
 // ── Boot ─────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {

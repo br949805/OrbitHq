@@ -24,3 +24,41 @@
 .type-idea{background:var(--amber-bg);color:var(--amber)}
 .type-plan{background:var(--purple-bg);color:var(--purple)}
 .type-note{background:var(--bg4);color:var(--text2)}
+
+/* ── Mobile notes filter bar (hidden on desktop) ─────────────── */
+#mob-notes-filter-bar{display:none}
+@media(max-width:768px){
+  #mob-notes-filter-bar{
+    display:flex;gap:6px;padding:8px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);
+    scrollbar-width:none
+  }
+  #mob-notes-filter-bar::-webkit-scrollbar{display:none}
+  .mob-nf-chip{
+    background:var(--bg3);border:1px solid var(--border);border-radius:14px;
+    color:var(--text3);font-family:var(--mono);font-size:12px;padding:6px 13px;
+    cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all var(--t);
+    -webkit-tap-highlight-color:transparent;min-height:34px;display:flex;align-items:center
+  }
+  .mob-nf-chip.mob-nf-active{background:var(--accent);border-color:var(--accent);color:#0f0f0f;font-weight:700}
+  .mob-nf-folders{border-style:dashed}
+
+  /* Mobile folder picker modal body */
+  .mob-folder-row{display:flex;align-items:center;gap:10px;padding:13px 18px;cursor:pointer;font-size:15px;color:var(--text2);transition:background var(--t);-webkit-tap-highlight-color:transparent;border-bottom:1px solid var(--border)}
+  .mob-folder-row:last-child{border-bottom:none}
+  .mob-folder-row:hover,.mob-folder-row:active{background:var(--bg3);color:var(--text)}
+  .mob-folder-ic{font-size:16px;width:24px;text-align:center;flex-shrink:0}
+  .mob-folder-sec{padding:8px 18px 4px;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
+
+  /* Fix nl-header on mobile: full width, proper sizing */
+  #nl-header{padding:10px 12px 8px}
+  #nl-header h3{font-size:16px}
+  .new-note-btn{font-size:13px;padding:7px 14px;min-height:36px}
+
+  /* Bigger note items for touch */
+  .nitem{padding:12px 14px}
+  .ntitle{font-size:14px}
+  .nmeta{font-size:12px;margin-top:2px}
+  .npreview{font-size:12px;margin-top:3px}
+  .ntbadge{font-size:11px;padding:2px 6px}
+}
