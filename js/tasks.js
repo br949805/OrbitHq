@@ -107,6 +107,7 @@ function buildTaskCard(task, extraCls) {
         </div>
       </div>
       <button class="tax task-note-btn${hasNotes ? ' active' : ''}" onclick="toggleTaskNotes('${task.id}',this)" title="Notes">≡</button>
+      ${task.subtasks && task.subtasks.length ? `<button class="tax subtask-toggle-btn" onclick="toggleSubtaskArea('${task.id}',event)" title="Subtasks" style="font-size:13px">✓${task.subtasks.filter(s=>s.completedAt).length}/${task.subtasks.length}</button>` : ''}
       <div class="tactions"><button class="tax" onclick="openTaskDetail('${task.id}')" title="Details">⋯</button><button class="tax" onclick="deleteTask('${task.id}')">✕</button></div>
     </div>
     <div class="task-notes-area">
@@ -115,6 +116,22 @@ function buildTaskCard(task, extraCls) {
         onkeydown="if(event.key==='Escape')this.blur()"
       >${esc(task.notes || '')}</textarea>
       <div class="task-notes-links">${buildNotesLinks(task.notes || '')}</div>
+    </div>
+    <div class="subtask-area">
+      <div class="subtask-list">
+        ${(task.subtasks || []).map(s => `
+          <div class="subtask-row" data-sid="${s.id}">
+            <div class="stchk${s.completedAt ? ' done' : ''}" onclick="toggleSubtask('${task.id}','${s.id}')"></div>
+            <div class="sttitle" contenteditable="true" spellcheck="false"
+              onblur="saveSubtaskTitle('${task.id}','${s.id}',this)"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtaskInline('${task.id}');this.blur()}if(event.key==='Escape')this.blur()"
+              style="${s.completedAt ? 'text-decoration:line-through;color:var(--text3)' : ''}"
+            >${esc(s.title)}</div>
+            <button class="tax stdelete" onclick="deleteSubtask('${task.id}','${s.id}')">✕</button>
+          </div>
+        `).join('')}
+      </div>
+      <div class="subtask-add" onclick="addSubtaskInline('${task.id}')">+ subtask</div>
     </div>`;
   return div;
 }
@@ -158,6 +175,7 @@ function openTaskDetail(id) {
   document.getElementById('td-recur').value   = t.recur  || '';
   document.getElementById('td-notes').value   = t.notes  || '';
   document.getElementById('td-created').textContent = fmtTS(t.createdAt);
+  renderDetailSubtasks(t);
   document.getElementById('task-detail-modal').classList.add('open');
   setTimeout(() => document.getElementById('td-title').focus(), 50);
 }
@@ -169,6 +187,15 @@ function saveTaskDetail() {
   t.due   = document.getElementById('td-due').value   || null;
   t.recur = document.getElementById('td-recur').value || null;
   t.notes = document.getElementById('td-notes').value;
+  // Sync subtask titles from detail modal inputs
+  const subRows = document.querySelectorAll('#td-subtasks .td-sub-row');
+  subRows.forEach(row => {
+    const sid = row.dataset.sid;
+    const inp = row.querySelector('.td-sub-inp');
+    const sub = (t.subtasks || []).find(s => s.id === sid);
+    if (sub && inp) { const val = inp.value.trim(); if (val) sub.title = val; }
+  });
+  t.subtasks = (t.subtasks || []).filter(s => s.title.trim());
   save(); renderTasks(); closeModal('task-detail-modal'); toast('Task updated');
 }
 
@@ -195,9 +222,10 @@ function toggleTask(id) {
   const t = S.tasks.find(t => t.id === id); if (!t) return;
   if (t.completedAt) { delete t.completedAt; save(); renderTasks(); return; }
   t.completedAt = Date.now();
+  (t.subtasks || []).forEach(s => { if (!s.completedAt) s.completedAt = Date.now(); });
   if (t.recur && t.due) {
     const nd = nextRecur(t.due, t.recur);
-    if (nd) { S.tasks.push({ id:uid(), title:t.title, due:nd, recur:t.recur, noteId:t.noteId||null, createdAt:Date.now(), completedAt:null }); toast('↻ Next: ' + fmtDate(nd)); }
+    if (nd) { S.tasks.push({ id:uid(), title:t.title, due:nd, recur:t.recur, noteId:t.noteId||null, subtasks:[], createdAt:Date.now(), completedAt:null }); toast('↻ Next: ' + fmtDate(nd)); }
   }
   // Play chime and animate card out, then immediately archive
   playCompleteChime();
@@ -319,7 +347,7 @@ function submitEmailFollowUp() {
   if (!title) { document.getElementById('ef-title').style.borderColor = 'var(--red)'; return; }
   if (!due)   { document.getElementById('ef-due').style.borderColor   = 'var(--red)'; return; }
   const notes = _pendingEmailLink ? _pendingEmailLink : '';
-  S.tasks.unshift({ id:uid(), title, due, recur:null, noteId:null, notes, createdAt:nowMs(), completedAt:null });
+  S.tasks.unshift({ id:uid(), title, due, recur:null, noteId:null, notes, subtasks:[], createdAt:nowMs(), completedAt:null });
   save(); renderTasks(); closeModal('email-followup-modal');
   toast('Follow-up task created');
 }
@@ -342,4 +370,101 @@ function editTaskDate(id, el, e) {
   document.body.appendChild(pop); inp.focus();
   inp.onchange = () => { t.due = inp.value || null; save(); renderTasks(); pop.remove(); };
   setTimeout(() => { function h(ev) { if (!pop.contains(ev.target)) { pop.remove(); document.removeEventListener('click', h); } } document.addEventListener('click', h); }, 100);
+}
+
+// ── Subtask CRUD ─────────────────────────────────────────────
+
+function toggleSubtaskArea(taskId, e) {
+  e.stopPropagation();
+  const card = document.querySelector(`.tcard[data-id="${taskId}"]`);
+  if (!card) return;
+  const area = card.querySelector('.subtask-area');
+  const isOpen = area.classList.toggle('open');
+  card.classList.toggle('subtasks-open', isOpen);
+}
+
+function toggleSubtask(taskId, subId) {
+  const t = S.tasks.find(t => t.id === taskId); if (!t) return;
+  const s = (t.subtasks || []).find(s => s.id === subId); if (!s) return;
+  s.completedAt = s.completedAt ? null : Date.now();
+  save(); renderTasks();
+}
+
+function addSubtaskInline(taskId) {
+  const t = S.tasks.find(t => t.id === taskId); if (!t) return;
+  if (!t.subtasks) t.subtasks = [];
+  const sub = { id: uid(), title: '', completedAt: null };
+  t.subtasks.push(sub);
+  save(); renderTasks();
+  const card = document.querySelector(`.tcard[data-id="${taskId}"]`);
+  if (card) {
+    card.querySelector('.subtask-area').classList.add('open');
+    const rows = card.querySelectorAll('.subtask-row');
+    const last = rows[rows.length - 1];
+    if (last) last.querySelector('.sttitle').focus();
+  }
+}
+
+function saveSubtaskTitle(taskId, subId, el) {
+  const t = S.tasks.find(t => t.id === taskId); if (!t) return;
+  const s = (t.subtasks || []).find(s => s.id === subId); if (!s) return;
+  const v = el.textContent.trim();
+  if (!v) {
+    t.subtasks = t.subtasks.filter(s => s.id !== subId);
+    save(); renderTasks(); return;
+  }
+  s.title = v; save();
+}
+
+function deleteSubtask(taskId, subId) {
+  const t = S.tasks.find(t => t.id === taskId); if (!t) return;
+  t.subtasks = (t.subtasks || []).filter(s => s.id !== subId);
+  save(); renderTasks();
+}
+
+// ── Detail Modal Subtasks ────────────────────────────────────
+
+function renderDetailSubtasks(task) {
+  const container = document.getElementById('td-subtasks');
+  container.innerHTML = '';
+  (task.subtasks || []).forEach(s => {
+    const row = document.createElement('div');
+    row.className = 'td-sub-row';
+    row.dataset.sid = s.id;
+    row.innerHTML = `
+      <div class="stchk${s.completedAt ? ' done' : ''}" onclick="toggleDetailSubtask('${s.id}')"></div>
+      <input class="fi td-sub-inp" type="text" value="${esc(s.title)}"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtaskInDetail()}"
+        style="font-size:13px;padding:5px 7px">
+      <button class="tax" onclick="removeDetailSubtask('${s.id}')" style="flex-shrink:0">✕</button>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function toggleDetailSubtask(subId) {
+  const t = S.tasks.find(t => t.id === _taskDetailId); if (!t) return;
+  const s = (t.subtasks || []).find(s => s.id === subId); if (!s) return;
+  s.completedAt = s.completedAt ? null : Date.now();
+  save();
+  renderDetailSubtasks(t);
+}
+
+function addSubtaskInDetail() {
+  const t = S.tasks.find(t => t.id === _taskDetailId); if (!t) return;
+  if (!t.subtasks) t.subtasks = [];
+  const sub = { id: uid(), title: '', completedAt: null };
+  t.subtasks.push(sub);
+  save();
+  renderDetailSubtasks(t);
+  const container = document.getElementById('td-subtasks');
+  const inputs = container.querySelectorAll('.td-sub-inp');
+  if (inputs.length) inputs[inputs.length - 1].focus();
+}
+
+function removeDetailSubtask(subId) {
+  const t = S.tasks.find(t => t.id === _taskDetailId); if (!t) return;
+  t.subtasks = (t.subtasks || []).filter(s => s.id !== subId);
+  save();
+  renderDetailSubtasks(t);
 }

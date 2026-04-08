@@ -174,7 +174,7 @@ function submitConvTask() {
   const title = document.getElementById('conv-task-title').value.trim();
   if (!title) { document.getElementById('conv-task-title').style.borderColor = 'var(--red)'; return; }
   const due = document.getElementById('conv-task-due').value || null;
-  S.tasks.unshift({ id:uid(), title, due, recur:null, noteId:null, createdAt:nowMs(), completedAt:null });
+  S.tasks.unshift({ id:uid(), title, due, recur:null, noteId:null, subtasks:[], createdAt:nowMs(), completedAt:null });
   S.notes = S.notes.filter(n => n.id !== note.id);
   pStats.converted++; pStats.applied++; incrCleared(); save();
   pQueue.splice(pIndex, 1); closeModal('conv-task-modal');

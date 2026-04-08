@@ -80,7 +80,7 @@
 
 ## Detailed Implementation Notes
 
-### ⚡ 1. Progressive Web App (PWA) Manifest
+### ⚡ 1. Progressive Web App (PWA) Manifest DONE
 
 Adding a `manifest.json` and a minimal service worker would allow users to install OrbitHq directly to their desktop or mobile home screen. This requires no backend and costs almost nothing to implement.
 
@@ -105,7 +105,7 @@ The Snippet note type is specifically designed for code, yet code blocks render 
 - Auto-detect language from the `language` metadata field of Snippet notes
 - **Estimated effort: 0.5 days**
 
-### ⚡ 4. Read / Focus Mode
+### ⚡ 4. Read / Focus Mode DONE
 
 A read mode toggle would hide the editor chrome (toolbar, metadata fields) and render note content as clean, formatted HTML — ideal for reviewing meeting notes or reading long-form content.
 
@@ -115,7 +115,7 @@ A read mode toggle would hide the editor chrome (toolbar, metadata fields) and r
 
 ---
 
-### 🔵 5. Image Paste & Upload
+### 🔵 5. Image Paste & Upload DONE
 
 The inability to paste a screenshot into a note is a frequent pain point. Implementation:
 
@@ -133,7 +133,7 @@ Without version history, a mis-click or accidental clear can destroy meeting not
 - Modal shows timestamped snapshots; click to preview or restore
 - **Estimated effort: 1–2 days**
 
-### 🔵 7. Task Subtasks
+### 🔵 7. Task Subtasks DONE
 
 Adding a collapsible sub-task list under any parent task would significantly increase utility without requiring a full project management redesign:
 

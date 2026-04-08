@@ -451,7 +451,7 @@ function executeSlashCommand(cmd) {
 
 function insertInlineTask(block) {
   const taskId = uid();
-  const task = { id:taskId, title:'', due:null, recur:null, noteId:S.activeNoteId||null, createdAt:nowMs(), completedAt:null };
+  const task = { id:taskId, title:'', due:null, recur:null, noteId:S.activeNoteId||null, subtasks:[], createdAt:nowMs(), completedAt:null };
   S.tasks.unshift(task);
   const div  = document.createElement('div');  div.className = 'task-item'; div.dataset.taskId = taskId;
   const chk  = document.createElement('span'); chk.className = 'ti-chk';
@@ -534,7 +534,7 @@ document.addEventListener('mousedown', e => {
 function createTaskFromSel() {
   const sel  = window.getSelection(); const text = sel ? sel.toString().trim() : ''; if (!text) return;
   document.getElementById('float-tb').classList.remove('open');
-  const task = { id:uid(), title:text, due:null, recur:null, noteId:S.activeNoteId||null, createdAt:nowMs(), completedAt:null };
+  const task = { id:uid(), title:text, due:null, recur:null, noteId:S.activeNoteId||null, subtasks:[], createdAt:nowMs(), completedAt:null };
   S.tasks.unshift(task); save(); renderTasks(); toast('Task created: ' + text.slice(0, 30));
 }
 
@@ -895,6 +895,7 @@ edContent.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); ec('bold'); }
   if ((e.ctrlKey || e.metaKey) && e.key === 'i') { e.preventDefault(); ec('italic'); }
   if ((e.ctrlKey || e.metaKey) && e.key === 'u') { e.preventDefault(); ec('underline'); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'j') { e.preventDefault(); toggleFocusMode(); }
   if (e.key === 'Tab') {
     const s = window.getSelection();
     if (s && s.anchorNode) {
@@ -1009,7 +1010,7 @@ function submitExtract() {
   if (!noteId || !_extractTexts.length) return;
   const dueDates = [...document.querySelectorAll('.extract-item-due')].map(inp => inp.value || null);
   _extractTexts.forEach((title, i) => {
-    S.tasks.unshift({ id:uid(), title, due: dueDates[i] || null, recur:null, noteId, createdAt:nowMs(), completedAt:null });
+    S.tasks.unshift({ id:uid(), title, due: dueDates[i] || null, recur:null, noteId, subtasks:[], createdAt:nowMs(), completedAt:null });
   });
   const count = _extractTexts.length;
   _extractTexts = [];
@@ -1017,4 +1018,19 @@ function submitExtract() {
   save();
   renderTasks();
   toast(`Created ${count} task${count !== 1 ? 's' : ''} from list`);
+}
+
+// ── Focus Mode ───────────────────────────────────────────────
+
+function toggleFocusMode() {
+  const edWrap = document.getElementById('ed-wrap');
+  const btn = document.getElementById('focus-mode-btn');
+  const isEnabled = edWrap.classList.toggle('focus-mode');
+  btn.classList.toggle('active', isEnabled);
+  if (isEnabled) {
+    document.getElementById('ed-content').focus();
+    toast('Focus mode on');
+  } else {
+    toast('Focus mode off');
+  }
 }

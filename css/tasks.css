@@ -52,6 +52,9 @@
 .task-note-btn{display:none;flex-shrink:0;font-size:14px}
 .task-note-btn:hover{color:var(--accent);background:none}
 .task-note-btn.active{color:var(--accent)}
+.subtask-toggle-btn{display:flex !important;flex-shrink:0;font-size:12px !important;padding:2px 6px !important}
+.subtask-toggle-btn:hover{color:var(--accent)}
+.tcard.subtasks-open .subtask-toggle-btn{color:var(--accent)}
 .tcard:hover .task-note-btn,.tcard.has-notes .task-note-btn,.tcard.notes-open .task-note-btn{display:flex}
 .task-notes-area{display:none;padding:0 14px 8px 37px}
 .task-notes-area.open{display:block}
@@ -67,6 +70,24 @@
 .task-notes-links:not(:empty){display:flex;flex-direction:column;gap:2px;padding:4px 0 2px}
 .tnotes-link{font-size:11px;color:var(--accent);font-family:var(--mono);word-break:break-all;text-decoration:none;line-height:1.4}
 .tnotes-link:hover{text-decoration:underline}
+/* ── Subtasks ────────────────────────────────────────────────── */
+.subtask-area{display:none;padding:0 14px 6px 37px}
+.subtask-area.open{display:block}
+.subtask-list{display:flex;flex-direction:column;gap:1px}
+.subtask-row{display:flex;align-items:center;gap:6px;padding:3px 0}
+.subtask-row:hover .stdelete{display:block}
+.stchk{width:12px;height:12px;border:1.5px solid var(--border2);border-radius:2px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all var(--t);background:transparent}
+.stchk:hover{border-color:var(--accent)}
+.stchk.done{background:var(--accent);border-color:var(--accent)}
+.stchk.done::after{content:'\2713';font-size:9px;color:#0f0f0f;font-weight:700}
+.sttitle{font-size:12px;color:var(--text2);line-height:1.4;flex:1;min-width:0;word-break:break-word;cursor:text;outline:none;padding:1px 3px;border-radius:2px;transition:background var(--t)}
+.sttitle:focus{background:var(--bg4)}
+.stdelete{display:none;font-size:11px;padding:1px 3px}
+.subtask-add{font-size:11px;color:var(--text3);cursor:pointer;padding:3px 0;transition:color var(--t);font-family:var(--mono)}
+.subtask-add:hover{color:var(--accent)}
+.td-sub-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.td-sub-row .fi{flex:1;margin-bottom:0}
+
 #email-drop-zone{display:flex;align-items:center;justify-content:center;gap:7px;margin:6px 10px 8px;padding:9px 10px;border:1px dashed var(--border2);border-radius:var(--r);color:var(--text3);font-size:11px;font-family:var(--mono);cursor:default;transition:all var(--t);flex-shrink:0;user-select:none}
 .edz-icon{font-size:14px;opacity:.6;flex-shrink:0}
 .edz-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -89,4 +110,9 @@
   .tactions{display:flex}
   .tax{font-size:16px;padding:4px 8px;min-height:36px;min-width:36px;display:flex;align-items:center;justify-content:center}
   #archive-link{font-size:13px;padding:12px 14px}
+  .subtask-area{padding:0 14px 6px 44px}
+  .stchk{width:16px;height:16px;border-radius:3px}
+  .sttitle{font-size:13px}
+  .stdelete{display:block;font-size:14px;padding:4px 8px;min-height:36px;min-width:36px;display:flex;align-items:center;justify-content:center}
+  .subtask-add{font-size:12px;padding:6px 0}
 }

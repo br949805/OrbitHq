@@ -22,6 +22,9 @@
 .fs-dot.connected{background:var(--accent);box-shadow:0 0 4px var(--accent)}
 .fs-dot.disconnected{background:var(--text3)}
 .fs-dot.pending{background:var(--amber)}
+.fs-dot.sync-ok{background:var(--blue);box-shadow:0 0 4px var(--blue)}
+.fs-dot.sync-error{background:var(--red)}
+.fs-dot.sync-locked{background:var(--purple)}
 .fs-name{overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
 .fs-disconnect,.fs-reconnect{background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;flex-shrink:0}
 .fs-disconnect:hover{color:var(--red)}

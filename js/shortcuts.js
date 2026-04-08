@@ -7,7 +7,7 @@ document.addEventListener('keydown', e => {
   const editing = ['input','textarea','select'].includes(tag) || document.activeElement.contentEditable === 'true';
 
   if (e.key === 'Escape') {
-    ['cap-modal','type-modal','folder-modal','assign-folder-modal','conv-task-modal','settings-modal'].forEach(id => closeModal(id));
+    ['cap-modal','type-modal','folder-modal','assign-folder-modal','conv-task-modal','settings-modal','sync-modal'].forEach(id => closeModal(id));
     closeWikiAC(); hideArchive();
     if (document.getElementById('processor').classList.contains('vis')) exitProcessor();
     return;

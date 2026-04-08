@@ -64,11 +64,24 @@ async function _continueBoot() {
   const nb = getActiveNotebook();
   if (nb) await fileStore.initForNotebook(nb.id);
   if (nb) setStorageKey(nb.lsKey);
+
+  // Handle Dropbox OAuth callback if present
+  if (typeof dropboxSync !== 'undefined') {
+    const wasCallback = await dropboxSync.handleAuthCallback();
+    if (wasCallback) {
+      // User just returned from Dropbox auth — auto-open sync modal to prompt for password
+      setTimeout(() => {
+        if (typeof openSyncModal === 'function') openSyncModal();
+      }, 200);
+    }
+  }
+
   await loadAsync();
   applyTheme(S.settings.theme || 'default');
   applyFontSize(S.settings.fontSize || 'default');
   applyHeadingStyles();
   updateNotebookStatusUI();
+  if (typeof updateSyncStatusUI === 'function') updateSyncStatusUI();
   renderNotebookSwitcher();
   _applyFuMode();
   _updateContactBadge();

@@ -70,6 +70,13 @@
         <div class="set-row">
           <div style="flex:1"><div class="set-lbl">Notebook File</div><span id="set-nb-file-path" class="set-desc" style="font-family:var(--mono);font-size:11px;display:block;margin-top:2px">localStorage only</span></div>
         </div>
+        <div class="set-row">
+          <div style="flex:1">
+            <div class="set-lbl">Cloud Sync (Dropbox)</div>
+            <div class="set-desc">E2E encrypted — only you can read your data</div>
+          </div>
+          <button class="btn-gh" onclick="openSyncModal()">Manage</button>
+        </div>
         <div class="set-row" style="border-bottom:none;padding-top:14px;flex-direction:column;align-items:stretch;gap:8px">
           <button class="btn-dr" onclick="exportData()">Export JSON</button>
           <button class="btn-dr" onclick="if(confirm('Delete ALL data?')&&confirm('Are you sure?')){clearAllData()}">Delete All Data</button>
@@ -82,6 +89,7 @@
         <div id="file-status" class="fs-indicator fs-only" title="No file connected — data saved in browser only">
           <span class="fs-dot disconnected"></span><span class="fs-name">localStorage</span>
         </div>
+        <div id="cloud-status" class="fs-indicator" style="display:none;cursor:pointer;margin-left:auto" onclick="openSyncModal()" title="Cloud sync"></div>
       </div>
     </div>
   </div>
@@ -346,6 +354,7 @@
               <div class="tbb-sep"></div>
               <button class="tbb" onclick="triggerWiki()">[[ Link</button>
               <div class="autosave"><div class="asdot" id="asdot"></div><span id="aslbl">saved</span></div>
+              <button class="tbb" id="focus-mode-btn" onclick="toggleFocusMode()" title="Focus mode (Ctrl+J)">◲ Focus</button>
             </div>
             <div id="ed-scroll">
               <div id="ed-content" contenteditable="true" spellcheck="true" data-placeholder="Start writing… type [[ to link a note"></div>
@@ -392,6 +401,7 @@
         <div class="fg"><label class="fl">Recurrence</label><select class="fsel" id="td-recur"><option value="">None</option><option value="daily">Daily</option><option value="weekdays">Weekdays</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></div>
       </div>
       <div class="fg"><label class="fl">Notes</label><textarea class="fi" id="td-notes" style="height:80px;resize:vertical;font-family:var(--mono);font-size:12px" placeholder="Additional notes…"></textarea></div>
+      <div class="fg"><label class="fl">Subtasks</label><div id="td-subtasks"></div><button class="add-task-btn" style="margin-top:6px;width:100%" onclick="addSubtaskInDetail()">+ Add Subtask</button></div>
       <div style="font-size:11px;color:var(--text3);padding:6px 0 2px">Created: <span id="td-created"></span></div>
     </div>
     <div class="mft"><span class="mhint">↵ save &nbsp;·&nbsp; esc dismiss</span><button class="btn-pr" onclick="saveTaskDetail()">Save</button></div>
@@ -701,6 +711,21 @@
   </div>
 </div>
 
+<!-- SYNC SETTINGS MODAL -->
+<div class="mo" id="sync-modal" onclick="handleMoClick(event,'sync-modal')">
+  <div class="mb" style="width:480px">
+    <div class="mh">
+      <h3>Cloud Sync — Dropbox</h3>
+      <button class="mc" onclick="closeModal('sync-modal')">✕</button>
+    </div>
+    <div class="mbdy" id="sync-modal-body"><!-- populated by _populateSyncModal() --></div>
+    <div class="mft" id="sync-modal-footer">
+      <span class="mhint" id="sync-last-sync-lbl"></span>
+      <button class="btn-gh" onclick="closeModal('sync-modal')">Done</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -754,6 +779,9 @@
 <script src="js/graph.js"></script>
 <script src="js/tour.js"></script>
 <script src="js/mobile.js"></script>
+<script src="js/sync-crypto.js"></script>
+<script src="js/sync-dropbox.js"></script>
+<script src="js/sync.js"></script>
 <script src="js/app.js"></script>
 <script>
   if ('serviceWorker' in navigator) {

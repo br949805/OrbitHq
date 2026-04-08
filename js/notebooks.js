@@ -294,6 +294,7 @@ async function switchNotebook(id) {
   if (typeof checkNudges      === 'function') checkNudges();
 
   updateNotebookStatusUI();
+  if (typeof updateSyncStatusUI === 'function') updateSyncStatusUI();
   renderNotebookSwitcher();
   closeNotebookDropdown();
   if (typeof toast === 'function') toast('Switched to "' + nb.name + '"');
