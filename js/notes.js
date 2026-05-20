@@ -4,6 +4,70 @@
 
 let noteSearch = '';
 
+function onNoteSearch(val) {
+  noteSearch = val.trim();
+  const btn = document.getElementById('nl-search-clear');
+  if (btn) btn.classList.toggle('visible', noteSearch.length > 0);
+  renderNotesList();
+}
+
+function clearNoteSearch() {
+  noteSearch = '';
+  const inp = document.getElementById('nl-search');
+  if (inp) inp.value = '';
+  const btn = document.getElementById('nl-search-clear');
+  if (btn) btn.classList.remove('visible');
+  renderNotesList();
+}
+
+function parseNoteQuery(raw) {
+  // Tokenize respecting quoted phrases: "foo bar" stays as one token
+  const tokens = [];
+  const re = /"([^"]+)"|(\S+)/g;
+  let m;
+  while ((m = re.exec(raw)) !== null) tokens.push(m[1] || m[2]);
+
+  const parsed = { types: [], tags: [], folders: [], pinned: null, after: null, before: null, text: [] };
+  for (const tok of tokens) {
+    const lower = tok.toLowerCase();
+    if (lower === 'and' || lower === 'or') continue; // stop words
+    if (lower.startsWith('type:'))   { parsed.types.push(lower.slice(5)); continue; }
+    if (lower.startsWith('tag:'))    { parsed.tags.push(lower.slice(4)); continue; }
+    if (lower.startsWith('folder:')) { parsed.folders.push(lower.slice(7)); continue; }
+    if (lower === 'is:pinned')       { parsed.pinned = true; continue; }
+    if (lower === 'is:unpinned')     { parsed.pinned = false; continue; }
+    if (lower.startsWith('after:'))  { parsed.after = new Date(tok.slice(6)).getTime(); continue; }
+    if (lower.startsWith('before:')) { parsed.before = new Date(tok.slice(7)).getTime(); continue; }
+    parsed.text.push(lower);
+  }
+  return parsed;
+}
+
+function matchesQuery(note, q) {
+  if (q.types.length && !q.types.includes((note.type || '').toLowerCase())) return false;
+  if (q.tags.length) {
+    const noteTags = (note.tags || []).map(tid => { const t = (S.tags || []).find(x => x.id === tid); return t ? t.name.toLowerCase() : ''; });
+    if (!q.tags.every(qt => noteTags.some(nt => nt.includes(qt)))) return false;
+  }
+  if (q.folders.length) {
+    const folder = S.folders.find(f => f.id === note.folderId);
+    const fname = folder ? folder.name.toLowerCase() : '';
+    if (!q.folders.every(qf => fname.includes(qf))) return false;
+  }
+  if (q.pinned !== null && note.pinned !== q.pinned) return false;
+  if (q.after  !== null && !isNaN(q.after)  && note.updatedAt < q.after)  return false;
+  if (q.before !== null && !isNaN(q.before) && note.updatedAt > q.before) return false;
+  if (q.text.length) {
+    const haystack = [
+      note.title || '',
+      (note.content || '').replace(/<[^>]*>/g, ''),
+      JSON.stringify(note.metadata || '')
+    ].join(' ').toLowerCase();
+    if (!q.text.every(t => haystack.includes(t))) return false;
+  }
+  return true;
+}
+
 function setNoteFilter(filter, el) {
   S.noteFilter = filter;
   document.querySelectorAll('.si[id^="sb-"]').forEach(e => e.classList.remove('active'));
@@ -25,8 +89,8 @@ function setNoteFilter(filter, el) {
 function getFilteredNotes() {
   let notes = [...S.notes];
   if (noteSearch) {
-    const q = noteSearch.toLowerCase();
-    notes = notes.filter(n => (n.title || '').toLowerCase().includes(q) || (n.content || '').replace(/<[^>]*>/g,'').toLowerCase().includes(q) || JSON.stringify(n.metadata || {}).toLowerCase().includes(q));
+    const q = parseNoteQuery(noteSearch);
+    notes = notes.filter(n => matchesQuery(n, q));
   }
   if (S.noteFilter === 'all')    return notes;
   if (S.noteFilter === 'pinned') return notes.filter(n => n.pinned);

@@ -6,6 +6,13 @@
 #nl-header h3{font-family:var(--sans);font-size:15px;font-weight:700;flex:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .new-note-btn{background:none;border:1px solid var(--border2);border-radius:var(--r);color:var(--text3);font-size:12px;padding:3px 8px;cursor:pointer;font-family:var(--mono);transition:all var(--t);white-space:nowrap}
 .new-note-btn:hover{border-color:var(--accent);color:var(--accent)}
+#nl-search-row{display:flex;align-items:center;gap:4px;padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+#nl-search{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:12px;padding:5px 8px;outline:none;transition:border-color var(--t)}
+#nl-search:focus{border-color:var(--accent)}
+#nl-search::placeholder{color:var(--text3)}
+#nl-search-clear{background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;padding:2px 4px;border-radius:var(--r);transition:color var(--t);display:none}
+#nl-search-clear.visible{display:block}
+#nl-search-clear:hover{color:var(--text)}
 #nl-scroll{flex:1;overflow-y:auto}
 .nl-sec-hdr{padding:6px 12px 3px;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
 .nitem{padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background var(--t);position:relative}
@@ -51,6 +58,8 @@
   .mob-folder-sec{padding:8px 18px 4px;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
 
   /* Fix nl-header on mobile: full width, proper sizing */
+  #nl-search-row{padding:6px 10px}
+  #nl-search{font-size:13px;padding:7px 9px}
   #nl-header{padding:10px 12px 8px}
   #nl-header h3{font-size:16px}
   .new-note-btn{font-size:13px;padding:7px 14px;min-height:36px}
