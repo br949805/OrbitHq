@@ -284,6 +284,8 @@
         <div id="notes-list">
           <div id="nl-header"><h3 id="nl-heading">All Notes</h3><button class="new-note-btn" onclick="openTypeSelector()">+ Add Note</button><button class="panel-collapse-btn" id="notes-collapse-btn" onclick="toggleNotesPanel()" title="Collapse">‹</button></div>
           <div id="nl-search-row"><input id="nl-search" type="text" placeholder='Search… type: tag: is:pinned after:' autocomplete="off" spellcheck="false" oninput="onNoteSearch(this.value)" /><button id="nl-search-clear" onclick="clearNoteSearch()" title="Clear search">✕</button></div>
+          <div id="nl-search-ac"></div>
+          <div id="nl-toolbar"><select id="nl-sort" onchange="onNoteSort(this.value)" title="Sort notes"><option value="updated">Modified</option><option value="created">Created</option><option value="alpha">A → Z</option><option value="alpha-desc">Z → A</option></select></div>
           <!-- Mobile-only filter/folder strip -->
           <div id="mob-notes-filter-bar">
             <button class="mob-nf-chip mob-nf-active" onclick="mobNoteFilter('all',this)">All</button>
@@ -337,7 +339,7 @@
               <div class="tbb-sep"></div>
               <button class="tbb" id="tbb-ul" onclick="ec('insertUnorderedList')">• List</button>
               <button class="tbb" id="tbb-ol" onclick="ec('insertOrderedList')">1. List</button>
-              <button class="tbb tbb-accent" onclick="openExtractModal()" title="Convert list items to tasks">↗ Tasks</button>
+              <button class="tbb tbb-accent" onclick="insertInlineTask(null)" title="Insert inline task">☐ Task</button>
               <div class="tbb-sep"></div>
               <button class="tbb" onclick="insertTable()">⊞ Table</button>
               <button class="tbb" onclick="insertCode()">{ } Code</button>
@@ -362,8 +364,11 @@
             <div id="ed-scroll">
               <div id="ed-content" contenteditable="true" spellcheck="true" data-placeholder="Start writing… type [[ to link a note"></div>
               <div id="backlinks" style="display:none">
-                <div class="bl-hdr" onclick="toggleBacklinks()"><span class="bl-tog" id="bl-tog">▶</span><span>Linked From</span><span id="bl-ct" style="color:var(--text3);font-size:10px;margin-left:4px"></span></div>
-                <div id="bl-body" style="display:none"></div>
+                <div class="bl-hdr" onclick="toggleBacklinks()"><span class="bl-tog" id="bl-tog">▶</span><span>Linked Notes</span><span id="bl-ct" style="color:var(--text3);font-size:10px;margin-left:4px"></span></div>
+                <div id="bl-body" style="display:none">
+                  <div id="bl-outgoing"></div>
+                  <div id="bl-incoming"></div>
+                </div>
               </div>
             </div>
           </div>

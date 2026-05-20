@@ -496,14 +496,43 @@ function toggleInlineTask(taskId) {
 // ── Backlinks ────────────────────────────────────────────────
 
 function renderBacklinks(note) {
-  const sec    = document.getElementById('backlinks');
-  const body   = document.getElementById('bl-body');
-  const ct     = document.getElementById('bl-ct');
-  const linking = S.notes.filter(n => n.id !== note.id && (n.content || '').includes(`data-note-id="${note.id}"`));
-  ct.textContent = `(${linking.length})`; sec.style.display = 'block';
-  body.innerHTML = '';
-  if (!linking.length) { body.innerHTML = '<div class="bl-empty">No backlinks yet.</div>'; return; }
-  linking.forEach(n => { const a = document.createElement('a'); a.className = 'bl-link'; a.textContent = n.title || 'Untitled'; a.onclick = () => openNote(n.id); body.appendChild(a); });
+  const sec      = document.getElementById('backlinks');
+  const ct       = document.getElementById('bl-ct');
+  const outEl    = document.getElementById('bl-outgoing');
+  const inEl     = document.getElementById('bl-incoming');
+
+  // Outgoing: wiki links inside this note's content
+  const outIds = [...(note.content || '').matchAll(/data-note-id="([^"]+)"/g)].map(m => m[1]);
+  const outNotes = outIds.map(id => S.notes.find(n => n.id === id)).filter(Boolean);
+
+  // Incoming: notes that link to this note
+  const inNotes = S.notes.filter(n => n.id !== note.id && (n.content || '').includes(`data-note-id="${note.id}"`));
+
+  const total = outNotes.length + inNotes.length;
+  ct.textContent = `(${total})`; sec.style.display = 'block';
+
+  const mkLinks = (notes, container) => {
+    container.innerHTML = '';
+    notes.forEach(n => {
+      const a = document.createElement('a'); a.className = 'bl-link';
+      a.textContent = n.title || 'Untitled'; a.onclick = () => openNote(n.id);
+      container.appendChild(a);
+    });
+  };
+
+  outEl.innerHTML = '';
+  inEl.innerHTML  = '';
+
+  if (!total) { inEl.innerHTML = '<div class="bl-empty">No linked notes yet.</div>'; return; }
+
+  if (outNotes.length) {
+    const h = document.createElement('div'); h.className = 'bl-sec-hdr'; h.textContent = 'Links to';
+    outEl.appendChild(h); mkLinks(outNotes, outEl);
+  }
+  if (inNotes.length) {
+    const h = document.createElement('div'); h.className = 'bl-sec-hdr'; h.textContent = 'Linked from';
+    inEl.appendChild(h); mkLinks(inNotes, inEl);
+  }
 }
 
 function toggleBacklinks() {
