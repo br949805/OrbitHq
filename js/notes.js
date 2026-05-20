@@ -3,11 +3,70 @@
 // ──────────────────────────────────────────────────────────────
 
 let noteSearch = '';
+let noteSort   = 'updated';
 
 function onNoteSearch(val) {
   noteSearch = val.trim();
   const btn = document.getElementById('nl-search-clear');
   if (btn) btn.classList.toggle('visible', noteSearch.length > 0);
+  handleSearchAC(val);
+  renderNotesList();
+}
+
+function handleSearchAC(val) {
+  const ac = document.getElementById('nl-search-ac');
+  if (!ac) return;
+  // Find if cursor is right after "tag:" with a partial name
+  const m = val.match(/(?:^|\s)tag:(\S*)$/);
+  if (!m) { ac.innerHTML = ''; ac.classList.remove('open'); return; }
+  const partial = m[1].toLowerCase();
+  const tags = (S.tags || []).filter(t => t.name.toLowerCase().includes(partial)).slice(0, 8);
+  if (!tags.length) { ac.innerHTML = ''; ac.classList.remove('open'); return; }
+  ac.innerHTML = '';
+  tags.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'nl-ac-item' + (i === 0 ? ' foc' : '');
+    div.innerHTML = `<span class="nl-ac-dot" style="background:${t.color}"></span><span>${esc(t.name)}</span>`;
+    div.onmousedown = e => e.preventDefault();
+    div.onclick = () => selectSearchTag(t, partial);
+    ac.appendChild(div);
+  });
+  ac.classList.add('open');
+}
+
+function selectSearchTag(tag, partial) {
+  const inp = document.getElementById('nl-search');
+  if (!inp) return;
+  const val = inp.value;
+  // Replace the partial after the last "tag:" with the full tag name (quoted if needed)
+  const name = tag.name.includes(' ') ? `"${tag.name}"` : tag.name;
+  const newVal = val.replace(/tag:(\S*)$/, `tag:${name} `);
+  inp.value = newVal;
+  inp.focus();
+  closeSearchAC();
+  onNoteSearch(newVal);
+}
+
+function closeSearchAC() {
+  const ac = document.getElementById('nl-search-ac');
+  if (ac) { ac.innerHTML = ''; ac.classList.remove('open'); }
+}
+
+// Keyboard nav for search autocomplete
+document.addEventListener('keydown', e => {
+  const ac = document.getElementById('nl-search-ac');
+  if (!ac || !ac.classList.contains('open')) return;
+  const items = ac.querySelectorAll('.nl-ac-item');
+  const foc   = ac.querySelector('.nl-ac-item.foc');
+  const idx   = [...items].indexOf(foc);
+  if (e.key === 'ArrowDown') { e.preventDefault(); foc && foc.classList.remove('foc'); const n = items[(idx + 1) % items.length]; n && n.classList.add('foc'); }
+  if (e.key === 'ArrowUp')   { e.preventDefault(); foc && foc.classList.remove('foc'); const p = items[(idx - 1 + items.length) % items.length]; p && p.classList.add('foc'); }
+  if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); const f = ac.querySelector('.nl-ac-item.foc'); if (f) f.click(); }
+  if (e.key === 'Escape') closeSearchAC();
+});
+
+function onNoteSort(val) {
+  noteSort = val;
   renderNotesList();
 }
 
@@ -86,18 +145,25 @@ function setNoteFilter(filter, el) {
   if (currentView === 'inbox') showView('dashboard');
 }
 
+function sortNotes(notes) {
+  if (noteSort === 'created')    return [...notes].sort((a, b) => b.createdAt - a.createdAt);
+  if (noteSort === 'alpha')      return [...notes].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+  if (noteSort === 'alpha-desc') return [...notes].sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+  return [...notes].sort((a, b) => b.updatedAt - a.updatedAt); // 'updated' (default)
+}
+
 function getFilteredNotes() {
   let notes = [...S.notes];
   if (noteSearch) {
     const q = parseNoteQuery(noteSearch);
     notes = notes.filter(n => matchesQuery(n, q));
   }
-  if (S.noteFilter === 'all')    return notes;
-  if (S.noteFilter === 'pinned') return notes.filter(n => n.pinned);
-  if (S.noteFilter.startsWith('type:'))   return notes.filter(n => n.type === S.noteFilter.slice(5));
-  if (S.noteFilter.startsWith('folder:')) return notes.filter(n => n.folderId === S.noteFilter.slice(7));
-  if (S.noteFilter.startsWith('tag:'))    return notes.filter(n => (n.tags || []).includes(S.noteFilter.slice(4)));
-  return notes;
+  if (S.noteFilter === 'all')    return sortNotes(notes);
+  if (S.noteFilter === 'pinned') return sortNotes(notes.filter(n => n.pinned));
+  if (S.noteFilter.startsWith('type:'))   return sortNotes(notes.filter(n => n.type === S.noteFilter.slice(5)));
+  if (S.noteFilter.startsWith('folder:')) return sortNotes(notes.filter(n => n.folderId === S.noteFilter.slice(7)));
+  if (S.noteFilter.startsWith('tag:'))    return sortNotes(notes.filter(n => (n.tags || []).includes(S.noteFilter.slice(4))));
+  return sortNotes(notes);
 }
 
 function renderNotesList() {
@@ -118,12 +184,23 @@ function renderNotesList() {
   updateNoteBadges();
 }
 
+function hlText(str, terms) {
+  if (!terms || !terms.length) return esc(str);
+  let result = esc(str);
+  terms.forEach(term => {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    result = result.replace(new RegExp(escaped, 'gi'), m => `<mark class="hl">${m}</mark>`);
+  });
+  return result;
+}
+
 function buildNoteItem(note) {
   const td     = NT[note.type] || { label:note.type, icon:'○', cls:'type-note' };
   const folder = S.folders.find(f => f.id === note.folderId);
   const unproc = isUnprocessed(note);
   const preview = strip(note.content || '').slice(0, 60);
   const meta   = buildMetaSnippet(note);
+  const hlTerms = noteSearch ? parseNoteQuery(noteSearch).text : [];
   const div    = document.createElement('div');
   div.className = 'nitem' + (note.id === S.activeNoteId ? ' active' : '');
   div.dataset.id = note.id;
@@ -132,12 +209,12 @@ function buildNoteItem(note) {
     <div class="nitem-top">
       <span class="ntbadge ${td.cls}">${td.icon} ${td.label}</span>
       ${note.pinned ? '<span class="npin">⊙</span>' : ''}
-      <span class="ntitle">${esc(note.title || 'Untitled')}</span>
+      <span class="ntitle">${hlText(note.title || 'Untitled', hlTerms)}</span>
       ${unproc ? '<span class="nufiled">inbox</span>' : ''}
     </div>
     <div class="nmeta">${meta || (folder ? '📁 ' + esc(folder.name) : '')} ${fmtAge(note.updatedAt)}</div>
     ${(note.tags && note.tags.length) ? `<div class="ntags">${(note.tags).map(tid => { const t = S.tags ? S.tags.find(x => x.id === tid) : null; return t ? `<span class="ntag-chip" style="border-color:${t.color};color:${t.color}">${esc(t.name)}</span>` : ''; }).filter(Boolean).join('')}</div>` : ''}
-    ${preview ? `<div class="npreview">${esc(preview)}</div>` : ''}`;
+    ${preview ? `<div class="npreview">${hlText(preview, hlTerms)}</div>` : ''}`;
   return div;
 }
 

@@ -140,6 +140,7 @@
 .bl-link{font-size:13px;color:var(--blue);cursor:pointer;padding:1px 0;display:block}
 .bl-link:hover{text-decoration:underline}
 .bl-empty{font-size:12px;color:var(--text3);font-style:italic}
+.bl-sec-hdr{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-top:6px;margin-bottom:2px}
 
 /* ── Focus Mode ──────────────────────────────────────────────── */
 #ed-wrap.focus-mode #ed-header,

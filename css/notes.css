@@ -13,6 +13,14 @@
 #nl-search-clear{background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;padding:2px 4px;border-radius:var(--r);transition:color var(--t);display:none}
 #nl-search-clear.visible{display:block}
 #nl-search-clear:hover{color:var(--text)}
+#nl-search-ac{display:none;flex-direction:column;background:var(--bg2);border:1px solid var(--border);border-top:none;flex-shrink:0;max-height:180px;overflow-y:auto}
+#nl-search-ac.open{display:flex}
+.nl-ac-item{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--text2);transition:background var(--t)}
+.nl-ac-item:hover,.nl-ac-item.foc{background:var(--bg3);color:var(--text)}
+.nl-ac-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+#nl-toolbar{display:flex;align-items:center;gap:6px;padding:4px 10px 5px;border-bottom:1px solid var(--border);flex-shrink:0}
+#nl-sort{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text3);font-family:var(--mono);font-size:11px;padding:3px 6px;cursor:pointer;outline:none;transition:border-color var(--t)}
+#nl-sort:hover,#nl-sort:focus{border-color:var(--accent);color:var(--text)}
 #nl-scroll{flex:1;overflow-y:auto}
 .nl-sec-hdr{padding:6px 12px 3px;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
 .nitem{padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background var(--t);position:relative}
@@ -25,6 +33,7 @@
 .nufiled{font-size:10px;color:var(--text3);border:1px solid var(--border);border-radius:2px;padding:0 3px;margin-left:auto;flex-shrink:0}
 .nmeta{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .npreview{font-size:12px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+mark.hl{background:var(--amber-bg);color:var(--amber);border-radius:2px;padding:0 1px;font-style:normal}
 .type-scratchpad{background:var(--bg4);color:var(--text3)}
 .type-meeting{background:var(--blue-bg);color:var(--blue)}
 .type-snippet{background:var(--teal-bg);color:var(--teal)}
