@@ -23,6 +23,8 @@ function normalizeState() {
   if (!S.settings.fontSize)      S.settings.fontSize      = 'default';
   if (!S.tags) S.tags = [];
   S.notes.forEach(n => { if (!n.tags) n.tags = []; });
+  S.tasks.forEach(t => { if (!t.subtasks) t.subtasks = []; });
+  (S.archived || []).forEach(t => { if (!t.subtasks) t.subtasks = []; });
   if (!S.session)        S.session      = { lastWeekly:null, agedSnoozedUntil:null, clearedToday:0, clearedDate:null };
   if (!S.dismissedCtx)   S.dismissedCtx = [];
   if (!S.contacts)       S.contacts     = [];
@@ -38,7 +40,29 @@ function loadSync() {
 
 async function loadAsync() {
   loadSync();                          // always load localStorage first (instant fallback)
-  if (!fileStore.isActive(NB_ACTIVE_ID)) return;
+
+  // Attempt cloud pull if no local file connection
+  if (!fileStore.isActive(NB_ACTIVE_ID)) {
+    if (typeof pullNotebook === 'function' && isSyncEnabled && isSyncUnlocked && NB_ACTIVE_ID) {
+      try {
+        if (isSyncEnabled() && isSyncUnlocked()) {
+          const cloudData = await pullNotebook(NB_ACTIVE_ID);
+          if (cloudData) {
+            const migrated = applyVersionMigrations(cloudData);
+            const prevSettings = S.settings;
+            S = { ...S, ...migrated };
+            S.settings = { ...prevSettings, ...migrated.settings };
+          }
+        }
+      } catch (e) {
+        console.error('Cloud pull failed:', e);
+      }
+    }
+    normalizeState();
+    save();
+    return;
+  }
+
   const fileData = await fileStore.readFileForNotebook(NB_ACTIVE_ID);
   if (!fileData) return;
   const migrated = applyVersionMigrations(fileData);
@@ -61,4 +85,5 @@ function save() {
   const data = { version:1, savedAt:new Date().toISOString(), ...S };
   try { localStorage.setItem(_SK, JSON.stringify(S)); } catch(e) {}
   if (fileStore.isActive(NB_ACTIVE_ID)) fileStore.writeFileForNotebook(NB_ACTIVE_ID, data);  // async fire-and-forget
+  if (typeof pushNotebook === 'function') pushNotebook(NB_ACTIVE_ID);  // cloud sync fire-and-forget
 }

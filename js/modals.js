@@ -44,7 +44,7 @@ function submitCapture() {
     if (!title) { document.getElementById('cap-task-title').style.borderColor = 'var(--red)'; return; }
     const due   = document.getElementById('cap-task-due').value   || null;
     const recur = document.getElementById('cap-task-recur').value || null;
-    S.tasks.unshift({ id:uid(), title, due, recur, noteId:null, createdAt:nowMs(), completedAt:null });
+    S.tasks.unshift({ id:uid(), title, due, recur, noteId:null, subtasks:[], createdAt:nowMs(), completedAt:null });
     save(); renderTasks(); closeModal('cap-modal');
     document.getElementById('cap-task-title').value  = '';
     document.getElementById('cap-task-due').value    = '';
@@ -106,6 +106,7 @@ function toggleHamburger(forceOpen) {
     document.getElementById('set-font-size').value     = S.settings.fontSize || 'default';
     dropdown.classList.add('open');
     btn.classList.add('active');
+    if (typeof updateSyncStatusUI === 'function') updateSyncStatusUI();
   } else {
     dropdown.classList.remove('open');
     btn.classList.remove('active');
@@ -207,6 +208,9 @@ function updateNotebookStatusUI() {
   // Update settings panel file path display.
   const pathEl = document.getElementById('set-nb-file-path');
   if (pathEl) pathEl.textContent = active ? fname : (pending ? fname + ' (permission needed)' : 'localStorage only');
+
+  // Update cloud sync indicator
+  if (typeof updateSyncStatusUI === 'function') updateSyncStatusUI();
 }
 
 // Keep old name as alias for any callers.
@@ -465,4 +469,184 @@ function submitRenameNotebook() {
   renameNotebook(_renamingNbId, name);
   closeModal('nb-rename-modal');
   _renamingNbId = null;
+}
+
+// ── Cloud Sync Modal ─────────────────────────────────────────
+
+function openSyncModal() {
+  _populateSyncModal();
+  document.getElementById('sync-modal').classList.add('open');
+}
+
+function _populateSyncModal() {
+  const body = document.getElementById('sync-modal-body');
+  const footer = document.getElementById('sync-modal-footer');
+  const authorized = dropboxSync && dropboxSync._hasToken();
+  const unlocked = isSyncUnlocked && isSyncUnlocked();
+  const settings = getSyncSettings();
+  const lastSync = settings.lastSyncAt ? new Date(settings.lastSyncAt).toLocaleString() : 'Never';
+
+  footer.innerHTML = `<span class="mhint" id="sync-last-sync-lbl">Last sync: ${lastSync}</span><button class="btn-gh" onclick="closeModal('sync-modal')">Done</button>`;
+
+  if (!authorized) {
+    // State 1: Not connected
+    body.innerHTML = `
+      <div class="fg">
+        <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px">
+          Connect your Dropbox account to sync your notebooks securely. Your data is encrypted end-to-end — only you can decrypt it with your password.
+        </p>
+      </div>
+      <div class="frow" style="gap:10px">
+        <button class="btn-pr" style="flex:1" onclick="syncModalConnect()">🔗 Connect Dropbox</button>
+      </div>
+    `;
+  } else if (!unlocked) {
+    // State 2: Connected, locked
+    body.innerHTML = `
+      <div class="fg">
+        <label class="fl">Sync Status</label>
+        <div style="font-size:13px;color:var(--text2);padding:8px 0">Connected • Waiting for password</div>
+      </div>
+      <div class="fg">
+        <label class="fl">Encryption Password</label>
+        <input class="fi" id="sync-password-inp" type="password" placeholder="Enter your password…" style="font-size:15px;padding:8px">
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin:8px 0">Your password is never sent to any server — only used locally to encrypt your data.</div>
+      <div class="frow" style="gap:10px;margin-top:12px">
+        <button class="btn-pr" style="flex:1" onclick="syncModalUnlock()">🔓 Unlock</button>
+        <button class="btn-dr" style="flex:0" onclick="syncModalDisconnect()">Disconnect</button>
+      </div>
+    `;
+    setTimeout(() => document.getElementById('sync-password-inp').focus(), 50);
+  } else if (settings.enabled) {
+    // State 3: Connected, unlocked, enabled
+    body.innerHTML = `
+      <div class="fg">
+        <label class="fl">Status</label>
+        <div style="font-size:13px;color:var(--text2);padding:8px 0">✓ Synced and active</div>
+      </div>
+      <div class="fg" style="margin-top:12px">
+        <label class="fl" style="margin-bottom:4px">Auto-sync</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);cursor:pointer">
+          <input type="checkbox" id="sync-enabled-check" checked onchange="syncModalToggleEnabled(this.checked)" style="cursor:pointer">
+          Save changes automatically to Dropbox
+        </label>
+      </div>
+      <div class="frow" style="gap:10px;margin-top:16px">
+        <button class="btn-pr" style="flex:1" onclick="syncNow()">↻ Sync Now</button>
+        <button class="btn-gh" style="flex:0" onclick="syncModalLock()">🔒 Lock</button>
+      </div>
+      <button class="btn-dr" style="width:100%;margin-top:10px" onclick="syncModalDisconnect()">Disconnect Dropbox</button>
+    `;
+  } else {
+    // State 4: Connected, unlocked, disabled
+    body.innerHTML = `
+      <div class="fg">
+        <label class="fl">Status</label>
+        <div style="font-size:13px;color:var(--text2);padding:8px 0">Paused</div>
+      </div>
+      <div class="fg" style="margin-top:12px">
+        <label class="fl" style="margin-bottom:4px">Auto-sync</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);cursor:pointer">
+          <input type="checkbox" id="sync-enabled-check" onchange="syncModalToggleEnabled(this.checked)" style="cursor:pointer">
+          Save changes automatically to Dropbox
+        </label>
+      </div>
+      <div class="frow" style="gap:10px;margin-top:16px">
+        <button class="btn-pr" style="flex:1" onclick="syncModalToggleEnabled(true); setTimeout(_populateSyncModal, 100)">Enable Sync</button>
+        <button class="btn-gh" style="flex:0" onclick="syncModalLock()">🔒 Lock</button>
+      </div>
+      <button class="btn-dr" style="width:100%;margin-top:10px" onclick="syncModalDisconnect()">Disconnect Dropbox</button>
+    `;
+  }
+}
+
+function syncModalConnect() {
+  if (dropboxSync) dropboxSync.startAuth();
+}
+
+function syncModalDisconnect() {
+  if (confirm('Disconnect from Dropbox? (Your local data stays safe.)')) {
+    if (dropboxSync) dropboxSync.disconnect();
+    lockSync();
+    updateSyncStatusUI();
+    _populateSyncModal();
+    toast('Disconnected from Dropbox');
+  }
+}
+
+function syncModalUnlock() {
+  const pw = document.getElementById('sync-password-inp').value;
+  if (!pw) { toast('Enter a password'); return; }
+  unlockSync(pw).then(success => {
+    _populateSyncModal();
+    if (success && isSyncUnlocked()) {
+      toast('Sync unlocked');
+      updateSyncStatusUI();
+    } else {
+      toast('Could not unlock — check your password');
+    }
+  });
+}
+
+function syncModalLock() {
+  lockSync();
+  _populateSyncModal();
+  updateSyncStatusUI();
+  toast('Sync locked');
+}
+
+function syncModalToggleEnabled(val) {
+  const settings = getSyncSettings();
+  settings.enabled = val;
+  saveSyncSettings(settings);
+  updateSyncStatusUI();
+}
+
+function updateSyncStatusUI() {
+  const el = document.getElementById('cloud-status');
+  if (!el) return;
+
+  const status = getSyncStatus ? getSyncStatus() : 'idle';
+  const enabled = isSyncEnabled ? isSyncEnabled() : false;
+  const authorized = dropboxSync && dropboxSync._hasToken();
+  const unlocked = isSyncUnlocked ? isSyncUnlocked() : false;
+
+  if (!enabled || !authorized) {
+    el.style.display = 'none';
+    return;
+  }
+
+  el.style.display = 'flex';
+
+  let dotClass, label, title;
+  if (status === 'syncing') {
+    dotClass = 'pending';
+    label = 'syncing…';
+    title = 'Cloud sync in progress';
+  } else if (status === 'error') {
+    dotClass = 'sync-error';
+    label = 'sync error';
+    title = 'Sync failed — click to retry';
+  } else if (status === 'offline') {
+    dotClass = 'disconnected';
+    label = 'offline';
+    title = 'Sync offline — local data only';
+  } else if (!unlocked) {
+    dotClass = 'sync-locked';
+    label = 'locked';
+    title = 'Sync locked — unlock in settings';
+  } else {
+    dotClass = 'sync-ok';
+    label = 'cloud ✓';
+    title = 'Cloud sync active';
+  }
+
+  let html = `<span class="fs-dot ${dotClass}"></span><span class="fs-name">${label}</span>`;
+  if (status === 'error') {
+    html += `<button class="fs-reconnect" onclick="syncNow()" title="Retry sync">↺</button>`;
+  }
+
+  el.innerHTML = html;
+  el.title = title;
 }

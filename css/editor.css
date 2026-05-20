@@ -141,6 +141,19 @@
 .bl-link:hover{text-decoration:underline}
 .bl-empty{font-size:12px;color:var(--text3);font-style:italic}
 
+/* ── Focus Mode ──────────────────────────────────────────────── */
+#ed-wrap.focus-mode #ed-header,
+#ed-wrap.focus-mode #meta-block,
+#ed-wrap.focus-mode #tags-block,
+#ed-wrap.focus-mode #ctx-prompt,
+#ed-wrap.focus-mode #backlinks{display:none}
+#ed-wrap.focus-mode #ed-title{display:none}
+#ed-wrap.focus-mode #ed-content{padding:40px 60px}
+#ed-wrap.focus-mode{background:var(--bg)}
+#ed-wrap.focus-mode #ed-toolbar{opacity:.3;pointer-events:none;padding:5px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1px;flex-wrap:wrap;flex-shrink:0;background:var(--bg2)}
+#ed-wrap.focus-mode #focus-mode-btn{opacity:1;pointer-events:auto;color:var(--accent);background:var(--bg3)}
+#focus-mode-btn.active{color:var(--accent);background:var(--bg3)}
+
 /* ── Mobile editor ───────────────────────────────────────────── */
 #ed-mob-back{display:none}
 @media(max-width:768px){

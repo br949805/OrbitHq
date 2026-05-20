@@ -1,4 +1,4 @@
-const CACHE = 'orbithq-__BUILDTIME__';
+const CACHE = 'orbithq-20260405-subtasks';
 
 const ASSETS = [
   './',

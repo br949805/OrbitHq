@@ -7,6 +7,7 @@
 
 function isUnprocessed(n) {
   if (n.type === 'scratchpad') return true;
+  if (n.type === 'snippet') return false;
   if (!n.folderId && wc(n) < S.settings.wordThreshold) return true;
   return false;
 }
@@ -43,7 +44,7 @@ function renderInbox() {
   document.getElementById('processor').classList.remove('vis');
   const inbox = getInbox().sort((a, b) => (isAged(b) ? 1 : -1) - (isAged(a) ? 1 : -1) || (b.createdAt - a.createdAt));
   if (!inbox.length) {
-    wrap.innerHTML = `<div class="inbox-empty" style="padding:24px"><div class="ei">✦</div><div class="et">Inbox is clear</div><div class="es">Notes under ${S.settings.wordThreshold} words without a folder, and all Scratchpad notes, land here.</div></div>`;
+    wrap.innerHTML = `<div class="inbox-empty" style="padding:24px"><div class="ei">✦</div><div class="et">Inbox is clear</div><div class="es">Notes under ${S.settings.wordThreshold} words without a folder and all Scratchpad notes land here. Snippets are intentionally short and skip the inbox.</div></div>`;
     return;
   }
   const grid = document.createElement('div'); grid.className = 'inbox-grid';
@@ -92,13 +93,19 @@ function incrCleared() {
 
 // ── Processor ────────────────────────────────────────────────
 
-let pQueue = [], pIndex = 0, pSkipped = [], pStats = { applied:0, discarded:0, converted:0 };
+let pQueue = [], pIndex = 0, pSkipped = [], pStats = { applied:0, discarded:0, converted:0, snippetConverted:0 };
+let pSessionState = null;
 
 function startProcessor(agedOnly = false) {
+  if (pSessionState && pSessionState.agedOnly === agedOnly) {
+    resumeProcessor();
+    return;
+  }
   const inbox = agedOnly ? getAged() : getInbox();
   if (!inbox.length) { toast('Nothing to process'); return; }
   pQueue   = [...inbox].sort((a, b) => (isAged(b) ? 1 : 0) - (isAged(a) ? 1 : 0) || (a.createdAt - b.createdAt));
-  pIndex   = 0; pSkipped = []; pStats = { applied:0, discarded:0, converted:0 };
+  pIndex   = 0; pSkipped = []; pStats = { applied:0, discarded:0, converted:0, snippetConverted:0 };
+  pSessionState = { agedOnly, queueIds: pQueue.map(n => n.id) };
   document.getElementById('inbox-grid-wrap').style.display = 'none';
   document.getElementById('proc-done').classList.remove('vis');
   document.getElementById('proc-card').style.display = 'block';
@@ -106,9 +113,19 @@ function startProcessor(agedOnly = false) {
   populateProcFolders(); loadProcCard();
 }
 
-function exitProcessor() {
+function resumeProcessor() {
+  if (!pSessionState || !pQueue.length) { startProcessor(pSessionState?.agedOnly || false); return; }
+  document.getElementById('inbox-grid-wrap').style.display = 'none';
+  document.getElementById('proc-done').classList.remove('vis');
+  document.getElementById('proc-card').style.display = 'block';
+  document.getElementById('processor').classList.add('vis');
+  populateProcFolders(); loadProcCard();
+}
+
+function exitProcessor(clearSession = true) {
   document.getElementById('processor').classList.remove('vis');
   document.getElementById('inbox-grid-wrap').style.display = '';
+  if (clearSession) pSessionState = null;
   updateInboxStats(); renderInbox();
 }
 
@@ -131,11 +148,22 @@ function loadProcCard() {
   document.getElementById('pc-ttl').textContent = note.title || 'Untitled';
   const txt = strip(note.content || '');
   const bdy = document.getElementById('pc-bdy');
-  bdy.textContent = txt ? txt.slice(0, 300) + (txt.length > 300 ? '…' : '') : 'No content.';
+  const preview = txt ? txt.slice(0, 300) + (txt.length > 300 ? '…' : '') : 'No content.';
+  bdy.textContent = preview;
   bdy.className = 'pc-bdy' + (txt ? '' : ' empty');
   document.getElementById('pc-type-sel').value   = '';
   document.getElementById('pc-folder-sel').value = note.folderId || '';
+  document.getElementById('pc-expand-btn').onclick = () => openProcCardModal(note.id);
   const card = document.getElementById('proc-card'); card.style.animation = 'none'; card.offsetHeight; card.style.animation = 'card-in .2s ease';
+}
+
+function openProcCardModal(noteId) {
+  const note = S.notes.find(n => n.id === noteId);
+  if (!note) return;
+  const txt = strip(note.content || '');
+  document.getElementById('proc-modal-ttl').textContent = note.title || 'Untitled';
+  document.getElementById('proc-modal-body').textContent = txt || 'No content.';
+  document.getElementById('proc-full-modal').classList.add('open');
 }
 
 function procApply() {
@@ -174,12 +202,22 @@ function submitConvTask() {
   const title = document.getElementById('conv-task-title').value.trim();
   if (!title) { document.getElementById('conv-task-title').style.borderColor = 'var(--red)'; return; }
   const due = document.getElementById('conv-task-due').value || null;
-  S.tasks.unshift({ id:uid(), title, due, recur:null, noteId:null, createdAt:nowMs(), completedAt:null });
+  S.tasks.unshift({ id:uid(), title, due, recur:null, noteId:null, subtasks:[], createdAt:nowMs(), completedAt:null });
   S.notes = S.notes.filter(n => n.id !== note.id);
   pStats.converted++; pStats.applied++; incrCleared(); save();
   pQueue.splice(pIndex, 1); closeModal('conv-task-modal');
   if (pIndex >= pQueue.length) { showProcDone(); return; }
   loadProcCard(); renderTasks(); toast('Task created & note deleted');
+}
+
+function procConvertToSnippet() {
+  const note = pQueue[pIndex]; if (!note) return;
+  note.type = 'snippet';
+  note.updatedAt = nowMs();
+  pStats.snippetConverted++; pStats.applied++; incrCleared(); save();
+  pQueue.splice(pIndex, 1);
+  if (pIndex >= pQueue.length) { showProcDone(); return; }
+  loadProcCard(); renderNotesList(); updateNoteBadges(); updateInboxBadge(); toast('Converted to Snippet');
 }
 
 function showProcDone() {
@@ -190,8 +228,10 @@ function showProcDone() {
   document.getElementById('done-stats').innerHTML = `
     <div class="ds"><div class="ds-n">${pStats.applied}</div><div class="ds-l">Processed</div></div>
     <div class="ds"><div class="ds-n">${pStats.converted}</div><div class="ds-l">→ Tasks</div></div>
+    <div class="ds"><div class="ds-n">${pStats.snippetConverted}</div><div class="ds-l">→ Snippets</div></div>
     <div class="ds"><div class="ds-n">${pStats.discarded}</div><div class="ds-l">Discarded</div></div>
     <div class="ds"><div class="ds-n">${pSkipped.length}</div><div class="ds-l">Skipped</div></div>`;
   if (!getInbox().length) { S.session.lastWeekly = todayISO(); save(); }
+  pSessionState = null;
   renderNotesList(); updateNoteBadges(); updateInboxBadge(); updateInboxStats();
 }
